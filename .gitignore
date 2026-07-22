@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+**/.env
+!**/.env.example
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Build
+dist/
+build/
+**/dist/
+**/build/
+.vite/
+coverage/
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Android
+android/.gradle/
+android/**/build/
+android/local.properties
+android/**/captures/
+*.apk
+*.aab
+*.keystore
+
+# Nest / TypeScript
+backend/dist/
+*.tsbuildinfo
+
+# Misc
+.turbo/
+.cache/
