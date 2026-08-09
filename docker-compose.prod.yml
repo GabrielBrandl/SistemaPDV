@@ -1,20 +1,22 @@
-# Produção — EasyPanel / Docker
+# Produção — EasyPanel Compose (apps-pyrou / sistema-pdv)
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      DB_TYPE: postgres
+      DB_TYPE: ${DB_TYPE:-postgres}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT:-5432}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_SSL: ${DB_SSL:-false}
-      DATABASE_URL: ${DATABASE_URL:-}
+      DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
-      PORT: 3000
+      PORT: "3000"
       SUPABASE_URL: ${SUPABASE_URL:-}
       SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
@@ -26,18 +28,15 @@ services:
       EMPRESA_RAZAO: ${EMPRESA_RAZAO:-}
       EMPRESA_UF_CODIGO: ${EMPRESA_UF_CODIGO:-13}
       NFCE_SERIE: ${NFCE_SERIE:-1}
-    ports:
-      - "3000:3000"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/v1/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
+    expose:
+      - "3000"
 
   web:
-    build: ./web-admin
+    build:
+      context: ./web-admin
+      dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     depends_on:
       - backend
