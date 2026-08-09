@@ -17,16 +17,18 @@ export class SoftPosProvider {
     return 'demo';
   }
 
-  createSession(input: {
+    createSession(input: {
     valor: number;
     forma: 'debito' | 'credito';
     comandaId: string;
   }) {
     const providerRef = `softpos_${randomBytes(8).toString('hex')}`;
     const instruction =
-      this.mode === 'demo'
-        ? 'Aproxime o cartão de crédito/débito na parte de trás do celular (NFC). Em modo demo, use "Simular aprovação".'
-        : `Inicie o SoftPOS (${this.mode}): aproxime o cartão contactless no NFC do telefone.`;
+      this.mode === 'pagbank'
+        ? 'PagBank SmartPOS: o app nativo abre o PlugPag no terminal (débito/crédito/PIX). Aproxime o cartão ou pague PIX na Moderninha.'
+        : this.mode === 'demo'
+          ? 'Modo demo: use o app Android (flavor demo) ou simule no painel web.'
+          : `SoftPOS (${this.mode}): aproxime o cartão contactless.`;
 
     return {
       provider: this.mode,
@@ -34,12 +36,12 @@ export class SoftPosProvider {
       instruction,
       amountCents: Math.round(input.valor * 100),
       forma: input.forma,
-      // Payload que o app Android/WebView usará com o SDK
       softposRequest: {
         amount: Math.round(input.valor * 100),
         type: input.forma === 'credito' ? 'CREDIT' : 'DEBIT',
         reference: input.comandaId,
         provider: this.mode,
+        terminal: this.mode === 'pagbank' ? 'pagbank_smartpos' : 'phone',
       },
     };
   }

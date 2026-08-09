@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/txtHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="PDV · Aproxime a pulseira"
+        android:textColor="@color/amber"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtComanda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/muted"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/inputUid"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:hint="UID NFC"
+        android:textColor="@color/text"
+        android:textColorHint="@color/muted"
+        android:background="@color/surface"
+        android:padding="10dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTap"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Ler / Abrir comanda"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/amber"
+        android:textColor="@color/bg" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listProducts"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/txtTotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total: R$ 0,00"
+        android:textColor="@color/text"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:paddingVertical="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPay"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:text="Pagar"
+            android:backgroundTint="@color/teal"
+            android:textColor="@android:color/white"
+            android:enabled="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExitMode"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Saída"
+            android:backgroundTint="@color/surface"
+            android:textColor="@color/text" />
+    </LinearLayout>
+</LinearLayout>

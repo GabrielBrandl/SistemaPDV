@@ -39,7 +39,7 @@ export class Customer {
   @Column({ name: 'supabase_id', type: 'varchar', nullable: true })
   supabaseId: string | null;
 
-  @Column({ name: 'ultimo_visita_em', type: 'datetime', nullable: true })
+  @Column({ name: 'ultimo_visita_em', type: 'timestamptz', nullable: true })
   ultimoVisitaEm: Date | null;
 
   @OneToMany(() => Card, (card) => card.customer)

@@ -41,7 +41,7 @@ export class PdvTerminal {
   @Column({ type: 'varchar', default: PdvTerminalStatus.OFFLINE })
   status: PdvTerminalStatus;
 
-  @Column({ name: 'ultimo_sync', type: 'datetime', nullable: true })
+  @Column({ name: 'ultimo_sync', type: 'timestamptz', nullable: true })
   ultimoSync: Date | null;
 
   @OneToMany(() => Session, (session) => session.pdv)

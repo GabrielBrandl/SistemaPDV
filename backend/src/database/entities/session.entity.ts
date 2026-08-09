@@ -29,10 +29,10 @@ export class Session {
   @JoinColumn({ name: 'operador_id' })
   operador: User;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamptz' })
   abertura: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamptz', nullable: true })
   fechamento: Date | null;
 
   @Column({ name: 'total_vendas', type: 'decimal', precision: 12, scale: 2, default: 0 })

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDV Cashless</string>
+    <string name="login_title">PDV Cashless · SmartPOS</string>
+    <string name="hint_email">E-mail</string>
+    <string name="hint_password">Senha</string>
+    <string name="hint_api">URL da API (ex: https://seu-servidor/api/v1)</string>
+    <string name="btn_login">Entrar</string>
+    <string name="btn_pay_pix">PIX</string>
+    <string name="btn_pay_debit">Débito</string>
+    <string name="btn_pay_credit">Crédito</string>
+    <string name="btn_release">Liberar saída</string>
+    <string name="nfc_hint">Aproxime a pulseira NFC</string>
+</resources>

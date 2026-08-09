@@ -73,10 +73,10 @@ export class PaymentIntent {
   @Column({ name: 'softpos_instruction', type: 'text', nullable: true })
   softposInstruction: string | null;
 
-  @Column({ name: 'expires_at', type: 'datetime', nullable: true })
+  @Column({ name: 'expires_at', type: 'timestamptz', nullable: true })
   expiresAt: Date | null;
 
-  @Column({ name: 'approved_at', type: 'datetime', nullable: true })
+  @Column({ name: 'approved_at', type: 'timestamptz', nullable: true })
   approvedAt: Date | null;
 
   @Column({ name: 'operador_id', type: 'varchar', nullable: true })

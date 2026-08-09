@@ -1,37 +1,39 @@
-# App Android Smart POS
+# App Android — PDV Cashless para maquininha PagBank (SmartPOS)
 
-Scaffold do aplicativo para maquininhas Android (Stone, Cielo, PagSeguro).
+App nativo obrigatório: WebView **não** é aceito na loja PagBank.
 
-## Estrutura
+## Flavors
 
-```
-android/app/src/main/java/com/pdvcashless/
-├── gateway/          # PaymentGateway + Stone/Cielo/PagSeguro
-├── data/local/       # Room entities (sync_queue)
-├── nfc/              # Extensões NFC (UID hex)
-└── ui/               # Jetpack Compose (a implementar)
-```
+| Flavor | Uso |
+|--------|-----|
+| `demo` | Emulador / celular sem PlugPag (pagamento simulado) |
+| `pagbank` | Moderninha Smart / terminais PagBank (PlugPag real) |
 
-## Próximos passos
+## Abrir no Android Studio
 
-1. Abrir pasta `android/` no Android Studio
-2. Configurar `local.properties` com `API_BASE_URL` e `STONE_CODE`
-3. Adicionar dependências Stone SDK no `build.gradle`
-4. Implementar telas Compose: login, grade de produtos, leitura NFC
-5. Implementar WorkManager para sync offline (Outbox Pattern)
+1. Abra a pasta `android/`
+2. Sync Gradle
+3. Selecione variante `pagbankDebug` (terminal) ou `demoDebug` (teste)
+4. Em `app/build.gradle.kts`, ajuste `API_BASE_URL` para seu backend HTTPS
 
-## Leitura NFC
+## Build APK PagBank
 
-```kotlin
-nfcAdapter.enableReaderMode(activity, { tag ->
-    val uid = tag.id.toHexString()
-    viewModel.processNfcUid(uid)
-}, NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B, null)
+```bash
+./gradlew :app:assemblePagbankRelease
 ```
 
-## Permissões (AndroidManifest.xml)
+APK em: `app/build/outputs/apk/pagbank/release/`
 
-```xml
-<uses-permission android:name="android.permission.NFC" />
-<uses-feature android:name="android.hardware.nfc" android:required="true" />
-```
+## Fluxo
+
+1. Login (operador/saída) apontando para a API
+2. Ativação do terminal com código PagBank (não-demo)
+3. PDV: NFC da pulseira → produtos → Pagar
+4. PlugPag: débito / crédito / PIX na maquininha
+5. App confirma no backend (`POST /payments/:id/confirm`)
+6. Tela Saída libera o cliente
+
+## Parceria PagBank
+
+É necessário contrato comercial + terminal de homologação + submissão do APK na loja PagBank.
+Docs: https://developer.pagbank.com.br/docs/desenvolvimento-smartpos

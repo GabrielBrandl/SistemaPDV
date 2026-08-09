@@ -36,7 +36,7 @@ export class SaldoReserve {
   @Column({ name: 'pdv_id', type: 'varchar', nullable: true })
   pdvId: string | null;
 
-  @Column({ name: 'expira_em', type: 'datetime' })
+  @Column({ name: 'expira_em', type: 'timestamptz' })
   expiraEm: Date;
 
   @Column({ type: 'varchar', default: ReserveStatus.ACTIVE })

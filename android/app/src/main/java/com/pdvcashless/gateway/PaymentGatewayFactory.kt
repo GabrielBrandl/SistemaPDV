@@ -1,35 +1,33 @@
 package com.pdvcashless.gateway
 
-enum class Acquirer {
-    STONE, CIELO, PAGSEGURO, GENERIC
-}
+import android.content.Context
+import com.pdvcashless.BuildConfig
 
 object PaymentGatewayFactory {
-    fun create(acquirer: Acquirer = Acquirer.STONE): PaymentGateway = when (acquirer) {
-        Acquirer.STONE -> StoneGateway()
-        Acquirer.CIELO -> CieloGateway()
-        Acquirer.PAGSEGURO -> PagSeguroGateway()
-        Acquirer.GENERIC -> GenericTEFGateway()
+    private lateinit var appContext: Context
+    private var gateway: PaymentGateway? = null
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
     }
-}
 
-class CieloGateway : PaymentGateway {
-    override suspend fun processPayment(amount: Long, type: PaymentType) =
-        PaymentResult(true, "CIELO-${System.currentTimeMillis()}", null)
-    override suspend fun cancelPayment(transactionId: String) = true
-    override suspend fun getTransactionStatus(id: String) = TransactionStatus.APPROVED
-}
+    fun get(): PaymentGateway {
+        gateway?.let { return it }
+        val g =
+            if (BuildConfig.DEMO_PAYMENT || !BuildConfig.HAS_PLUGPAG) {
+                DemoGateway()
+            } else {
+                PagBankGateway(appContext)
+            }
+        gateway = g
+        return g
+    }
 
-class PagSeguroGateway : PaymentGateway {
-    override suspend fun processPayment(amount: Long, type: PaymentType) =
-        PaymentResult(true, "PAGSEGURO-${System.currentTimeMillis()}", null)
-    override suspend fun cancelPayment(transactionId: String) = true
-    override suspend fun getTransactionStatus(id: String) = TransactionStatus.APPROVED
-}
+    fun usePagBank() {
+        gateway = PagBankGateway(appContext)
+    }
 
-class GenericTEFGateway : PaymentGateway {
-    override suspend fun processPayment(amount: Long, type: PaymentType) =
-        PaymentResult(false, null, "Adquirente não configurado")
-    override suspend fun cancelPayment(transactionId: String) = false
-    override suspend fun getTransactionStatus(id: String) = TransactionStatus.DECLINED
+    fun useDemo() {
+        gateway = DemoGateway()
+    }
 }

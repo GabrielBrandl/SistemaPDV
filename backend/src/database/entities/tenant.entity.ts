@@ -62,7 +62,7 @@ export class Tenant {
   @Column({ name: 'max_eventos', type: 'int', default: 5 })
   maxEventos: number;
 
-  @Column({ name: 'trial_ate', type: 'datetime', nullable: true })
+  @Column({ name: 'trial_ate', type: 'timestamptz', nullable: true })
   trialAte: Date | null;
 
   @OneToMany(() => User, (user) => user.tenant)

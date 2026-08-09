@@ -88,10 +88,10 @@ export class Comanda {
   @Column({ name: 'fechada_por', type: 'varchar', nullable: true })
   fechadaPor: string | null;
 
-  @Column({ name: 'fechada_em', type: 'datetime', nullable: true })
+  @Column({ name: 'fechada_em', type: 'timestamptz', nullable: true })
   fechadaEm: Date | null;
 
-  @Column({ name: 'paga_em', type: 'datetime', nullable: true })
+  @Column({ name: 'paga_em', type: 'timestamptz', nullable: true })
   pagaEm: Date | null;
 
   @Column({ type: 'text', nullable: true })

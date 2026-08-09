@@ -78,22 +78,22 @@ APIs admin: `GET /admin/overview`, `GET /admin/comandas`
 
 ## Estratégia de hardware
 
-**PDV no celular com NFC** (não usa maquininha dedicada):
-1. Celular do operador lê a **pulseira/cartão do cliente** (NFC)
-2. No pagamento, o mesmo celular:
-   - gera **PIX** (QR / copia e cola), ou
-   - recebe **cartão de crédito/débito por aproximação** (SoftPOS / Tap to Phone)
+**PDV em maquininha PagBank SmartPOS (Moderninha)** — app Android nativo com PlugPag  
+(guia: `docs/INSTALACAO_MAQUININHA_PAGBANK.pdf`)
 
-APIs: `POST /payments/pix`, `POST /payments/card`, `GET /payments/:id`, `POST /payments/:id/confirm`  
-Tela celular: `/pagar?comanda=UUID`
+Alternativa de treino: celular/Chrome (guia antigo em `docs/INSTALACAO_CELULAR.pdf`).
 
-### SoftPOS (cartão no telefone)
-Configure `SOFTPOS_PROVIDER=stone|pagbank|mercadopago` e integre o SDK Android.
-Em `demo`, use “Simular cartão aprovado” na tela `/pagar`.
+1. Backend online (HTTPS)
+2. App `android/` flavor **pagbank**
+3. Terminal PagBank + código de ativação
+4. Pulseira NFC + PIX/débito/crédito via PlugPag
+5. Liberação na saída
 
-### PIX
-Configure `PIX_PROVIDER=mercadopago|pagbank` + chaves do PSP.
-Em `demo`, QR é gerado localmente e “Simular PIX recebido” confirma.
+### SoftPOS / PlugPag
+- Flavor `demo`: pagamento simulado  
+- Flavor `pagbank`: SDK `PlugPagServiceWrapper` na Moderninha  
+
+APIs: `POST /payments/pix`, `POST /payments/card`, `POST /payments/:id/confirm`
 
 ## Onboarding
 

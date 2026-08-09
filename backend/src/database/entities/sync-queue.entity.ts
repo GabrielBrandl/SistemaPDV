@@ -32,7 +32,7 @@ export class SyncQueue {
   @Column({ default: 0 })
   tentativas: number;
 
-  @Column({ name: 'sincronizado_em', type: 'datetime', nullable: true })
+  @Column({ name: 'sincronizado_em', type: 'timestamptz', nullable: true })
   sincronizadoEm: Date | null;
 
   @CreateDateColumn({ name: 'criado_em' })

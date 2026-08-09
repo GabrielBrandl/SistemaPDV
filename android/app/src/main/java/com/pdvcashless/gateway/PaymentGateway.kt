@@ -1,31 +1,28 @@
 package com.pdvcashless.gateway
 
-/**
- * SoftPOS / Tap to Phone no celular Android.
- * Providers: Stone SoftPOS, PagBank Tap on Phone, Mercado Pago, Cielo SoftPOS.
- * O PDV web chama POST /payments/card e o app nativo processa softposRequest.
- */
 enum class PaymentType {
-    DEBIT, CREDIT, PIX
+    DEBIT,
+    CREDIT,
+    PIX,
 }
 
 data class PaymentResult(
     val success: Boolean,
     val transactionId: String?,
-    val message: String?
+    val message: String?,
+    val rawCode: Int? = null,
 )
 
-enum class TransactionStatus {
-    PENDING, APPROVED, DECLINED, CANCELLED
-}
-
 interface PaymentGateway {
-    /** Cartão contactless via NFC do telefone (SoftPOS) */
-    suspend fun processContactless(amountCents: Long, type: PaymentType): PaymentResult
+    /** Ativa o terminal PagBank (código de ativação do estabelecimento). */
+    suspend fun activate(activationCode: String): PaymentResult
 
-    /** PIX — preferir fluxo web/API; mantido para app nativo */
-    suspend fun processPix(amountCents: Long): PaymentResult
+    /** Débito/crédito/PIX via PlugPag no terminal SmartPOS. */
+    suspend fun doPayment(
+        amountCents: Int,
+        type: PaymentType,
+        userReference: String,
+    ): PaymentResult
 
-    suspend fun cancelPayment(transactionId: String): Boolean
-    suspend fun getTransactionStatus(id: String): TransactionStatus
+    suspend fun abort(): Boolean
 }

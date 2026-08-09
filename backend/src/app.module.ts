@@ -19,6 +19,7 @@ import { ExitModule } from './exit/exit.module';
 import { AdminModule } from './admin/admin.module';
 import { CustomersModule } from './customers/customers.module';
 import { PaymentsModule } from './payments/payments.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -29,15 +30,37 @@ import { PaymentsModule } from './payments/payments.module';
       useFactory: (config: ConfigService) => {
         const dbUrl = config.get<string>('DATABASE_URL');
         const dbType = config.get<string>('DB_TYPE', dbUrl ? 'postgres' : 'sqlite');
+        const dbHost = config.get<string>('DB_HOST');
 
-        if (dbType === 'postgres' && dbUrl) {
-          return {
+        if (dbType === 'postgres') {
+          const sslEnabled = ['true', '1', 'require'].includes(
+            (config.get<string>('DB_SSL') || 'false').toLowerCase(),
+          );
+          const base = {
             type: 'postgres' as const,
-            url: dbUrl,
             entities: entityList,
             synchronize: true,
-            logging: false,
+            logging: config.get<string>('DB_LOGGING') === 'true',
+            ssl: sslEnabled ? { rejectUnauthorized: false } : false,
+            extra: {
+              connectionTimeoutMillis: 15_000,
+            },
           };
+
+          if (dbUrl) {
+            return { ...base, url: dbUrl };
+          }
+
+          if (dbHost) {
+            return {
+              ...base,
+              host: dbHost,
+              port: Number(config.get<string>('DB_PORT') || 5432),
+              username: config.get<string>('DB_USER'),
+              password: config.get<string>('DB_PASSWORD'),
+              database: config.get<string>('DB_NAME'),
+            };
+          }
         }
 
         return {
@@ -67,5 +90,6 @@ import { PaymentsModule } from './payments/payments.module';
     FiscalModule,
     ReportsModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/login_title"
+            android:textColor="@color/amber"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PagBank SmartPOS · Moderninha"
+            android:textColor="@color/muted"
+            android:layout_marginBottom="24dp" />
+
+        <EditText
+            android:id="@+id/inputApi"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="@string/hint_api"
+            android:inputType="textUri"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/inputEmail"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="@string/hint_email"
+            android:inputType="textEmailAddress"
+            android:text="operador@pdv.local"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/inputPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="@string/hint_password"
+            android:inputType="textPassword"
+            android:text="operador123"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/inputActivation"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Código ativação PagBank (opcional no demo)"
+            android:inputType="text"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            style="@style/PosButton"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="@string/btn_login"
+            android:backgroundTint="@color/amber"
+            android:textColor="@color/bg" />
+
+        <TextView
+            android:id="@+id/txtError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

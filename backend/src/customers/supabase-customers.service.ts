@@ -21,7 +21,9 @@ export class SupabaseCustomersService {
   constructor(private readonly config: ConfigService) {
     this.url = this.config.get<string>('SUPABASE_URL')?.replace(/\/$/, '');
     this.key =
+      this.config.get<string>('SUPABASE_SECRET_KEY') ||
       this.config.get<string>('SUPABASE_SERVICE_ROLE_KEY') ||
+      this.config.get<string>('SUPABASE_PUBLISHABLE_KEY') ||
       this.config.get<string>('SUPABASE_ANON_KEY');
   }
 

@@ -31,10 +31,10 @@ export class Event {
   @Column()
   nome: string;
 
-  @Column({ name: 'data_inicio', type: 'datetime' })
+  @Column({ name: 'data_inicio', type: 'timestamptz' })
   dataInicio: Date;
 
-  @Column({ name: 'data_fim', type: 'datetime' })
+  @Column({ name: 'data_fim', type: 'timestamptz' })
   dataFim: Date;
 
   @Column({ type: 'varchar', default: EventStatus.DRAFT })
