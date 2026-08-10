@@ -236,10 +236,10 @@ export function PosPage() {
   const isPaid = comanda?.status === 'paid';
 
   return (
-    <div className="h-[calc(100vh-3rem)] flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">PDV · Comanda NFC</h2>
+    <div className="flex min-h-0 flex-col gap-4 md:h-[calc(100dvh-3rem)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-xl font-bold sm:text-2xl">PDV · Comanda NFC</h2>
           <p className="text-slate-400 text-sm">
             Aproxime a pulseira, lance produtos e feche só após o pagamento ·{' '}
             <a href="/cadastro" className="text-amber-400 hover:text-amber-300">
@@ -247,10 +247,10 @@ export function PosPage() {
             </a>
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 shrink-0">
           <button
             onClick={() => setNfcListening((v) => !v)}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold ${
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold sm:w-auto ${
               nfcListening
                 ? 'bg-emerald-500 text-slate-900'
                 : 'bg-slate-800 text-slate-200 border border-slate-700'
