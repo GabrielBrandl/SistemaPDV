@@ -179,7 +179,6 @@ function LimitCard({ label, max }: { label: string; max: number }) {
 
 function planRank(id: TenantPlanId | string): number {
   const order: Record<string, number> = {
-    free: 0,
     starter: 1,
     pro: 2,
     enterprise: 3,

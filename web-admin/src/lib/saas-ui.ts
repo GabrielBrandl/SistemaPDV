@@ -59,7 +59,6 @@ export function apiErrorMessage(err: unknown, fallback: string): string {
 }
 
 export const PLAN_OPTIONS = [
-  { value: 'free', label: 'Free' },
   { value: 'starter', label: 'Starter' },
   { value: 'pro', label: 'Pro' },
   { value: 'enterprise', label: 'Enterprise' },

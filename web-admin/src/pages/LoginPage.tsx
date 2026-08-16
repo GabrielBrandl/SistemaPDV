@@ -65,7 +65,7 @@ export function LoginPage() {
             </h1>
             <p className="mt-4 max-w-md text-slate-400">
               NFC, PDV, saída e fechamento em uma plataforma multi-tenant —
-              planos Free, Starter, Pro e Enterprise.
+              planos Starter, Pro e Enterprise.
             </p>
           </div>
           <div className="relative mt-10 flex flex-wrap gap-3 lg:mt-0">

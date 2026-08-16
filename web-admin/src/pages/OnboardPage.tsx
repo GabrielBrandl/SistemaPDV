@@ -35,7 +35,7 @@ export function OnboardPage() {
     const fromQuery = searchParams.get('plano') as TenantPlanId | null;
     if (
       fromQuery &&
-      ['free', 'starter', 'pro', 'enterprise'].includes(fromQuery)
+      ['starter', 'pro', 'enterprise'].includes(fromQuery)
     ) {
       setPlano(fromQuery);
     }
@@ -77,9 +77,8 @@ export function OnboardPage() {
             Operação cashless pronta em minutos
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-slate-400">
-            Comandas NFC, PDV, controle de saída e fechamento — no estilo Zig,
-            para bares, casas e festivais. Escolha o plano e configure seu
-            estabelecimento.
+            Comandas NFC, PDV, controle de saída e fechamento para bares, casas
+            e festivais. Escolha o plano e configure seu estabelecimento.
           </p>
         </div>
 

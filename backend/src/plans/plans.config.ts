@@ -19,27 +19,6 @@ export type PlanDefinition = {
 
 export const PLAN_CATALOG: PlanDefinition[] = [
   {
-    id: TenantPlan.FREE,
-    nome: 'Free',
-    descricao: 'Para testar o fluxo cashless em eventos pequenos.',
-    preco_mensal: 0,
-    preco_anual: 0,
-    trial_dias: 7,
-    limites: {
-      max_terminais: 1,
-      max_eventos: 1,
-      max_usuarios: 2,
-      max_cartoes: 50,
-    },
-    recursos: [
-      'PDV comanda NFC',
-      'Controle de saída',
-      '1 terminal',
-      'Relatórios básicos',
-      'Modo pagamento demo',
-    ],
-  },
-  {
     id: TenantPlan.STARTER,
     nome: 'Starter',
     descricao: 'Ideal para bares e casas noturnas em crescimento.',
@@ -53,7 +32,8 @@ export const PLAN_CATALOG: PlanDefinition[] = [
       max_cartoes: 2000,
     },
     recursos: [
-      'Tudo do Free',
+      'PDV comanda NFC',
+      'Controle de saída',
       'Cadastro e check-in de clientes',
       'Até 5 terminais PDV',
       'PIX + SoftPOS (demo/produção)',
@@ -65,7 +45,7 @@ export const PLAN_CATALOG: PlanDefinition[] = [
   {
     id: TenantPlan.PRO,
     nome: 'Pro',
-    descricao: 'Operação completa estilo Zig — multi-evento e escala.',
+    descricao: 'Operação completa para multi-evento e escala.',
     preco_mensal: 797,
     preco_anual: 7970,
     trial_dias: 14,
@@ -90,8 +70,8 @@ export const PLAN_CATALOG: PlanDefinition[] = [
     id: TenantPlan.ENTERPRISE,
     nome: 'Enterprise',
     descricao: 'Redes, festivais e white-label com limites customizados.',
-    preco_mensal: 2497,
-    preco_anual: 24970,
+    preco_mensal: 1997,
+    preco_anual: 19970,
     trial_dias: 30,
     limites: {
       max_terminais: 999,
