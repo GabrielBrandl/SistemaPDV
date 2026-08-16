@@ -19,3 +19,5 @@ export * from './api-integration.entity';
 export * from './exit-release.entity';
 export * from './customer.entity';
 export * from './payment-intent.entity';
+export * from './subscription-invoice.entity';
+export * from './audit-log.entity';

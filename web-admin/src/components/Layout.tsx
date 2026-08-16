@@ -17,7 +17,10 @@ import {
   Shield,
   ShoppingBag,
   Store,
+  Tags,
   UserPlus,
+  Users,
+  Wallet,
   X,
   type LucideIcon,
 } from 'lucide-react';
@@ -36,7 +39,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isSuper = user?.role === 'super_admin';
-  const isAdmin = user?.role === 'admin' || isSuper;
+  const isTenantAdmin = user?.role === 'admin';
+  const showOpsNav = !isSuper || !!impersonateTenantId;
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
@@ -73,28 +77,52 @@ export function Layout({ children }: { children: React.ReactNode }) {
     };
   }, [mobileOpen]);
 
+  const platformLinks: NavItem[] = isSuper
+    ? [
+        { to: '/platform', label: 'Plataforma', icon: LayoutDashboard },
+        { to: '/tenants', label: 'Empresas', icon: Building2 },
+        { to: '/precos', label: 'Planos', icon: Tags },
+      ]
+    : [];
+
+  const tenantAdminLinks: NavItem[] =
+    isTenantAdmin || (isSuper && !!impersonateTenantId)
+      ? [
+          { to: '/equipe', label: 'Equipe', icon: Users },
+          { to: '/billing', label: 'Assinatura', icon: Wallet },
+        ]
+      : [];
+
+  const opsLinks: NavItem[] = showOpsNav
+    ? [
+        ...(isTenantAdmin || (isSuper && !!impersonateTenantId)
+          ? [{ to: '/admin', label: 'Controle Admin', icon: Shield }]
+          : []),
+        { to: '/cadastro', label: 'Cadastro Cliente', icon: UserPlus },
+        { to: '/pos', label: 'PDV Comanda', icon: Store },
+        { to: '/saida', label: 'Controle de Saída', icon: DoorOpen },
+        { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/cards', label: 'Cartões NFC', icon: CreditCard },
+        { to: '/recharge', label: 'Recarga', icon: RefreshCw },
+        { to: '/products', label: 'Cardápio', icon: ShoppingBag },
+        { to: '/reports', label: 'Relatórios', icon: Receipt },
+        { to: '/pdv', label: 'Terminais PDV', icon: Radio },
+        { to: '/fiscal', label: 'Emitidor NFC-e', icon: Package },
+        ...(isTenantAdmin || (isSuper && !!impersonateTenantId)
+          ? [{ to: '/integrations', label: 'Integrações', icon: Plug }]
+          : []),
+      ]
+    : [];
+
   const links: NavItem[] = [
-    ...(isAdmin
-      ? [{ to: '/admin', label: 'Controle Admin', icon: Shield }]
-      : []),
-    { to: '/cadastro', label: 'Cadastro Cliente', icon: UserPlus },
-    { to: '/pos', label: 'PDV Comanda', icon: Store },
-    { to: '/saida', label: 'Controle de Saída', icon: DoorOpen },
-    { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/cards', label: 'Cartões NFC', icon: CreditCard },
-    { to: '/recharge', label: 'Recarga', icon: RefreshCw },
-    { to: '/products', label: 'Cardápio', icon: ShoppingBag },
-    { to: '/reports', label: 'Relatórios', icon: Receipt },
-    { to: '/pdv', label: 'Terminais PDV', icon: Radio },
-    { to: '/fiscal', label: 'Emitidor NFC-e', icon: Package },
-    ...(isAdmin
-      ? [{ to: '/integrations', label: 'Integrações', icon: Plug }]
-      : []),
+    ...platformLinks,
+    ...tenantAdminLinks,
+    ...opsLinks,
   ];
 
   const exitTenant = () => {
     setImpersonateTenantId(null);
-    navigate('/tenants');
+    navigate('/platform');
   };
 
   const doLogout = () => {
@@ -277,22 +305,11 @@ function Sidebar({
       </div>
 
       <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain">
-        {isSuper && (
-          <NavLink
-            to="/tenants"
-            title="Tenants"
-            className={linkClass}
-            onClick={onNavigate}
-          >
-            <Building2 size={18} className="shrink-0" />
-            {!collapsed && <span>Tenants</span>}
-          </NavLink>
-        )}
         {links.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === '/'}
+            end={to === '/' || to === '/platform'}
             title={label}
             className={linkClass}
             onClick={onNavigate}
@@ -314,13 +331,16 @@ function Sidebar({
             <p className="text-xs text-slate-500">{userRole}</p>
           </>
         )}
-        {isSuper && impersonateTenantId && !collapsed && (
+        {isSuper && impersonateTenantId && (
           <button
             type="button"
             onClick={onExitTenant}
-            className="text-xs text-amber-400 hover:text-amber-300"
+            className={`text-xs text-amber-400 hover:text-amber-300 ${
+              collapsed ? 'mx-auto' : ''
+            }`}
+            title="Sair do tenant"
           >
-            Sair do tenant
+            {collapsed ? '↩' : 'Sair do tenant'}
           </button>
         )}
         <button

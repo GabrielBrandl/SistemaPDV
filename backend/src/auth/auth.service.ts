@@ -28,15 +28,37 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
+    if (user.ativo === false) {
+      throw new UnauthorizedException('Usuário desativado');
+    }
+
+    let trialExpiringDays: number | null = null;
 
     if (user.tenantId) {
-      const tenant = await this.tenantsRepo.findOne({ where: { id: user.tenantId } });
+      const tenant = await this.tenantsRepo.findOne({
+        where: { id: user.tenantId },
+      });
       if (
         tenant &&
         (tenant.status === TenantStatus.SUSPENDED ||
           tenant.status === TenantStatus.CANCELLED)
       ) {
         throw new UnauthorizedException('Conta do estabelecimento suspensa');
+      }
+      if (
+        tenant &&
+        tenant.status === TenantStatus.TRIAL &&
+        tenant.trialAte &&
+        tenant.trialAte < new Date()
+      ) {
+        tenant.status = TenantStatus.SUSPENDED;
+        await this.tenantsRepo.save(tenant);
+        throw new UnauthorizedException('Período de trial expirado');
+      }
+      if (tenant?.status === TenantStatus.TRIAL && tenant.trialAte) {
+        trialExpiringDays = Math.ceil(
+          (tenant.trialAte.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+        );
       }
     }
 
@@ -63,8 +85,13 @@ export class AuthService {
             slug: user.tenant.slug,
             plano: user.tenant.plano,
             status: user.tenant.status,
+            trialAte: user.tenant.trialAte,
+            maxTerminais: user.tenant.maxTerminais,
+            maxEventos: user.tenant.maxEventos,
+            maxUsuarios: user.tenant.maxUsuarios,
           }
         : null,
+      trial_expiring_days: trialExpiringDays,
     };
   }
 }

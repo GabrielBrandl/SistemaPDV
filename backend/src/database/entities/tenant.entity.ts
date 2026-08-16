@@ -62,6 +62,33 @@ export class Tenant {
   @Column({ name: 'max_eventos', type: 'int', default: 5 })
   maxEventos: number;
 
+  @Column({ name: 'max_usuarios', type: 'int', default: 10 })
+  maxUsuarios: number;
+
+  @Column({ name: 'email_contato', type: 'varchar', nullable: true })
+  emailContato: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  telefone: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  cidade: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  uf: string | null;
+
+  @Column({ name: 'notas_internas', type: 'text', nullable: true })
+  notasInternas: string | null;
+
+  @Column({ name: 'ciclo_cobranca', type: 'varchar', default: 'monthly' })
+  cicloCobranca: string;
+
+  @Column({ name: 'valor_mensal', type: 'decimal', precision: 12, scale: 2, default: 0 })
+  valorMensal: number;
+
+  @Column({ name: 'proxima_cobranca', type: 'timestamptz', nullable: true })
+  proximaCobranca: Date | null;
+
   @Column({ name: 'trial_ate', type: 'timestamptz', nullable: true })
   trialAte: Date | null;
 

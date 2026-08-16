@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Card, Event, Order, OrderStatus } from '../database/entities';
+import { Card, Event, Order, OrderStatus, Tenant } from '../database/entities';
 import { CreateEventDto } from './dto/create-event.dto';
 
 @Injectable()
@@ -10,6 +14,7 @@ export class EventsService {
     @InjectRepository(Event) private readonly eventsRepo: Repository<Event>,
     @InjectRepository(Order) private readonly ordersRepo: Repository<Order>,
     @InjectRepository(Card) private readonly cardsRepo: Repository<Card>,
+    @InjectRepository(Tenant) private readonly tenantsRepo: Repository<Tenant>,
   ) {}
 
   findAll(tenantId: string) {
@@ -25,7 +30,15 @@ export class EventsService {
     return event;
   }
 
-  create(tenantId: string, dto: CreateEventDto) {
+  async create(tenantId: string, dto: CreateEventDto) {
+    const tenant = await this.tenantsRepo.findOne({ where: { id: tenantId } });
+    if (!tenant) throw new NotFoundException('Tenant não encontrado');
+    const count = await this.eventsRepo.count({ where: { tenantId } });
+    if (count >= tenant.maxEventos) {
+      throw new BadRequestException(
+        `Limite de eventos do plano (${tenant.maxEventos}) atingido`,
+      );
+    }
     const event = this.eventsRepo.create({
       tenantId,
       nome: dto.nome,

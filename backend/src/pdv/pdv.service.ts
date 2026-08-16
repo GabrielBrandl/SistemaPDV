@@ -5,7 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
-import { PdvTerminal, PdvTerminalStatus, Session } from '../database/entities';
+import {
+  PdvTerminal,
+  PdvTerminalStatus,
+  Session,
+  Tenant,
+} from '../database/entities';
 import { OpenSessionDto } from './dto/open-session.dto';
 import { CloseSessionDto } from './dto/close-session.dto';
 
@@ -16,6 +21,8 @@ export class PdvService {
     private readonly terminalsRepo: Repository<PdvTerminal>,
     @InjectRepository(Session)
     private readonly sessionsRepo: Repository<Session>,
+    @InjectRepository(Tenant)
+    private readonly tenantsRepo: Repository<Tenant>,
   ) {}
 
   async getOrCreateTerminal(tenantId: string, serial: string) {
@@ -23,6 +30,14 @@ export class PdvService {
       where: { tenantId, serial },
     });
     if (!terminal) {
+      const tenant = await this.tenantsRepo.findOne({ where: { id: tenantId } });
+      if (!tenant) throw new NotFoundException('Tenant não encontrado');
+      const count = await this.terminalsRepo.count({ where: { tenantId } });
+      if (count >= tenant.maxTerminais) {
+        throw new BadRequestException(
+          `Limite de terminais do plano (${tenant.maxTerminais}) atingido`,
+        );
+      }
       terminal = this.terminalsRepo.create({
         tenantId,
         serial,

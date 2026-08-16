@@ -36,6 +36,26 @@ export class SeedService implements OnModuleInit {
       await this.fullSeed();
     }
     await this.ensureExitUser();
+    await this.ensureSuperAdmin();
+  }
+
+  private async ensureSuperAdmin() {
+    const exists = await this.usersRepo.findOne({
+      where: { email: 'super@pdv.local' },
+    });
+    if (exists) return;
+    const password = await bcrypt.hash('super123', 10);
+    await this.usersRepo.save(
+      this.usersRepo.create({
+        email: 'super@pdv.local',
+        password,
+        name: 'Super Admin SaaS',
+        role: UserRole.SUPER_ADMIN,
+        tenantId: null,
+        ativo: true,
+      }),
+    );
+    this.logger.log('Super admin criado: super@pdv.local / super123');
   }
 
   private async ensureExitUser() {
@@ -79,6 +99,13 @@ export class SeedService implements OnModuleInit {
         nfceSerie: 1,
         maxTerminais: 10,
         maxEventos: 20,
+        maxUsuarios: 50,
+        emailContato: 'admin@pdv.local',
+        telefone: '11999990000',
+        cidade: 'São Paulo',
+        uf: 'SP',
+        valorMensal: 797,
+        cicloCobranca: 'monthly',
         trialAte,
       }),
     );

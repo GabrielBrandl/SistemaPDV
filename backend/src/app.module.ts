@@ -19,6 +19,9 @@ import { ExitModule } from './exit/exit.module';
 import { AdminModule } from './admin/admin.module';
 import { CustomersModule } from './customers/customers.module';
 import { PaymentsModule } from './payments/payments.module';
+import { PlatformModule } from './platform/platform.module';
+import { UsersModule } from './users/users.module';
+import { PlansModule } from './plans/plans.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -75,6 +78,9 @@ import { HealthController } from './health.controller';
     DatabaseModule,
     AuthModule,
     TenantsModule,
+    PlansModule,
+    PlatformModule,
+    UsersModule,
     CardsModule,
     CustomersModule,
     PaymentsModule,

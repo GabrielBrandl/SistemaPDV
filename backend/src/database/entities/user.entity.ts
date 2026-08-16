@@ -35,6 +35,12 @@ export class User {
   @Column({ name: 'tenant_id', type: 'varchar', nullable: true })
   tenantId: string | null;
 
+  @Column({ type: 'boolean', default: true })
+  ativo: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  telefone: string | null;
+
   @ManyToOne(() => Tenant, (tenant) => tenant.users, { nullable: true })
   @JoinColumn({ name: 'tenant_id' })
   tenant: Tenant | null;

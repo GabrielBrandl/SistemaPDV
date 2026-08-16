@@ -38,8 +38,8 @@ export class TenantsController {
     if (!user.tenantId) {
       return { tenant: null, role: user.role };
     }
-    const tenant = await this.tenantsService.findOne(user.tenantId);
-    return { tenant, role: user.role };
+    const stats = await this.tenantsService.getStats(user.tenantId);
+    return { ...stats, role: user.role };
   }
 
   @Get(':id')
@@ -69,11 +69,19 @@ export class TenantsController {
   ) {
     const targetId = user.role === 'super_admin' ? id : user.tenantId!;
     if (user.role === 'admin') {
-      const { plano, status, max_terminais, max_eventos, ...safe } = dto;
+      const {
+        plano,
+        status,
+        max_terminais,
+        max_eventos,
+        max_usuarios,
+        ...safe
+      } = dto;
       void plano;
       void status;
       void max_terminais;
       void max_eventos;
+      void max_usuarios;
       return this.tenantsService.update(targetId, safe);
     }
     return this.tenantsService.update(targetId, dto);

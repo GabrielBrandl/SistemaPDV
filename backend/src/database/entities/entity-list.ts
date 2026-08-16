@@ -19,6 +19,8 @@ import { ApiIntegration } from './api-integration.entity';
 import { ExitRelease } from './exit-release.entity';
 import { Customer } from './customer.entity';
 import { PaymentIntent } from './payment-intent.entity';
+import { SubscriptionInvoice } from './subscription-invoice.entity';
+import { AuditLog } from './audit-log.entity';
 
 export const entityList = [
   Tenant,
@@ -42,4 +44,6 @@ export const entityList = [
   ApiIntegration,
   ExitRelease,
   PaymentIntent,
+  SubscriptionInvoice,
+  AuditLog,
 ];

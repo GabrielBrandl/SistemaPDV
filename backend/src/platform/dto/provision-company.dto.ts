@@ -1,10 +1,22 @@
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { TenantPlan, TenantStatus } from '../../database/entities/tenant.entity';
+import {
+  IsEmail,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
+import { TenantPlan } from '../../database/entities/tenant.entity';
 
-export class UpdateTenantDto {
+export class ProvisionCompanyDto {
+  @IsString()
+  nome: string;
+
   @IsOptional()
   @IsString()
-  nome?: string;
+  slug?: string;
 
   @IsOptional()
   @IsString()
@@ -17,10 +29,6 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsEnum(TenantPlan)
   plano?: TenantPlan;
-
-  @IsOptional()
-  @IsEnum(TenantStatus)
-  status?: TenantStatus;
 
   @IsOptional()
   @IsString()
@@ -40,20 +48,12 @@ export class UpdateTenantDto {
 
   @IsOptional()
   @IsString()
-  focus_nfe_token?: string;
-
-  @IsOptional()
-  @IsString()
-  focus_nfe_ambiente?: string;
-
-  @IsOptional()
-  @IsString()
-  empresa_uf_codigo?: string;
+  notas_internas?: string;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  nfce_serie?: number;
+  trial_dias?: number;
 
   @IsOptional()
   @IsInt()
@@ -69,4 +69,23 @@ export class UpdateTenantDto {
   @IsInt()
   @Min(1)
   max_usuarios?: number;
+
+  @IsOptional()
+  @IsString()
+  ciclo_cobranca?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  valor_mensal?: number;
+
+  @IsString()
+  admin_name: string;
+
+  @IsEmail()
+  admin_email: string;
+
+  @IsString()
+  @MinLength(6)
+  admin_password: string;
 }

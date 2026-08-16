@@ -24,3 +24,19 @@ export function ProtectedRoute({ bare = false }: { bare?: boolean }) {
     </Layout>
   );
 }
+
+/** Public page that keeps the admin shell when the user is already logged in. */
+export function PublicOrAuthedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
+
+  if (token && user?.role !== 'exit') {
+    return <Layout>{children}</Layout>;
+  }
+
+  return <>{children}</>;
+}
