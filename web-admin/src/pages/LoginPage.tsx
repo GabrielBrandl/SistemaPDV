@@ -4,8 +4,8 @@ import api from '../services/api';
 import { useAuthStore } from '../store/auth';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('admin@pdv.local');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -68,22 +68,19 @@ export function LoginPage() {
               planos Free, Starter, Pro e Enterprise.
             </p>
           </div>
-          <div className="relative mt-10 space-y-3 text-sm text-slate-400 lg:mt-0">
-            <p>
-              Conheça os{' '}
-              <Link to="/precos" className="text-amber-400 hover:text-amber-300">
-                planos e preços
-              </Link>
-            </p>
-            <p>
-              Novo estabelecimento?{' '}
-              <Link
-                to="/onboard"
-                className="text-amber-400 hover:text-amber-300"
-              >
-                Criar conta
-              </Link>
-            </p>
+          <div className="relative mt-10 flex flex-wrap gap-3 lg:mt-0">
+            <Link
+              to="/precos"
+              className="inline-flex items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-2.5 text-sm font-semibold text-amber-300 transition hover:bg-amber-500/20"
+            >
+              Saiba mais
+            </Link>
+            <a
+              href="mailto:contato@pyrou.com.br?subject=PDV%20Cashless%20-%20Contato"
+              className="inline-flex items-center justify-center rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-amber-400"
+            >
+              Entre em contato
+            </a>
           </div>
         </aside>
 
@@ -108,6 +105,9 @@ export function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              required
+              placeholder="seu@email.com"
               className="mb-4 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
 
@@ -116,6 +116,9 @@ export function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              placeholder="••••••••"
               className="mb-6 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
 
@@ -127,26 +130,20 @@ export function LoginPage() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
 
-            <p className="mt-4 space-y-1 text-center text-xs text-slate-500">
-              <span className="block">Admin: admin@pdv.local / admin123</span>
-              <span className="block">
-                Plataforma: super@pdv.local / super123
-              </span>
-              <span className="block">Saída: saida@pdv.local / saida123</span>
-              <span className="block">
-                Bar: operador@pdv.local / operador123
-              </span>
-            </p>
-            <p className="mt-3 text-center text-sm text-slate-500">
-              Novo estabelecimento?{' '}
-              <Link to="/onboard" className="text-amber-400 hover:text-amber-300">
-                Criar conta
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <Link
+                to="/precos"
+                className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-amber-500/40 hover:text-amber-300"
+              >
+                Saiba mais
               </Link>
-              {' · '}
-              <Link to="/precos" className="text-amber-400 hover:text-amber-300">
-                Preços
-              </Link>
-            </p>
+              <a
+                href="mailto:contato@pyrou.com.br?subject=PDV%20Cashless%20-%20Contato"
+                className="inline-flex flex-1 items-center justify-center rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-amber-400"
+              >
+                Entre em contato
+              </a>
+            </div>
           </form>
         </div>
       </div>
