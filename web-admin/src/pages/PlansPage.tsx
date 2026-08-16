@@ -23,7 +23,7 @@ export function PlansPage() {
       }
     >
       <div className={token ? '' : 'mx-auto max-w-6xl'}>
-        <div className={token ? '' : 'mb-10 text-center'}>
+        <div className="mb-8 text-center md:mb-10">
           {!token && (
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-amber-400/80">
               PDV Cashless
@@ -36,12 +36,12 @@ export function PlansPage() {
           >
             Planos e preços
           </h1>
-          <p className="mt-2 max-w-2xl text-slate-400 md:mx-auto">
+          <p className="mx-auto mt-1.5 max-w-xl text-sm text-slate-400 md:mt-2 md:text-base">
             Do teste cashless ao festival multi-evento. Todos os planos incluem
             PDV comanda NFC e controle de saída.
           </p>
           {!token && (
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-3 text-sm text-slate-500">
               Já tem conta?{' '}
               <Link to="/login" className="text-amber-400">
                 Entrar
@@ -51,9 +51,9 @@ export function PlansPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-slate-400">Carregando planos...</p>
+          <p className="text-center text-slate-400">Carregando planos...</p>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-3">
             {plans?.map((p) => (
               <article
                 key={p.id}
