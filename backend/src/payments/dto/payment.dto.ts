@@ -9,6 +9,11 @@ export class CreatePixPaymentDto {
   @IsNumber()
   @Min(0.01)
   valor?: number;
+
+  /** Flavor da maquininha: cielo | mercadopago | pagbank | demo */
+  @IsOptional()
+  @IsString()
+  provider?: string;
 }
 
 export class CreateCardPaymentDto {
@@ -22,6 +27,10 @@ export class CreateCardPaymentDto {
   @IsNumber()
   @Min(0.01)
   valor?: number;
+
+  @IsOptional()
+  @IsString()
+  provider?: string;
 }
 
 export class ConfirmPaymentDto {

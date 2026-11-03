@@ -105,6 +105,7 @@ export class PaymentsService {
       valor: amount,
       comandaId: dto.comanda_id,
       descricao: `Comanda ${dto.comanda_id}`,
+      provider: dto.provider,
     });
 
     const intent = await this.intentsRepo.save(
@@ -145,10 +146,11 @@ export class PaymentsService {
       dto.valor,
     );
 
-    const session = this.softpos.createSession({
+    const session = await this.softpos.createSession({
       valor: amount,
       forma: dto.forma === PaymentMethod.CREDITO ? 'credito' : 'debito',
       comandaId: dto.comanda_id,
+      provider: dto.provider,
     });
 
     const intent = await this.intentsRepo.save(
@@ -170,8 +172,7 @@ export class PaymentsService {
     return {
       ...this.serialize(intent),
       softpos_request: session.softposRequest,
-      mensagem:
-        'Aproxime o cartão de crédito/débito no NFC do telefone (Tap to Phone / SoftPOS)',
+      mensagem: session.instruction,
     };
   }
 
@@ -186,6 +187,22 @@ export class PaymentsService {
     ) {
       intent.status = PaymentIntentStatus.EXPIRED;
       await this.intentsRepo.save(intent);
+    }
+
+    if (
+      intent.status === PaymentIntentStatus.AWAITING_CUSTOMER &&
+      intent.provider === 'mercadopago' &&
+      intent.providerRef
+    ) {
+      const remote = await this.softpos.checkMercadoPagoOrder(intent.providerRef);
+      if (remote?.paid) {
+        return this.confirm(
+          tenantId,
+          id,
+          { provider_ref: remote.paymentId || intent.providerRef },
+          intent.operadorId ?? undefined,
+        );
+      }
     }
 
     return this.serialize(intent);
@@ -260,6 +277,9 @@ export class PaymentsService {
     if (intent.status === PaymentIntentStatus.APPROVED) {
       throw new BadRequestException('Não é possível cancelar pagamento aprovado');
     }
+    if (intent.provider === 'mercadopago' && intent.providerRef) {
+      await this.softpos.cancelMercadoPagoOrder(intent.providerRef);
+    }
     intent.status = PaymentIntentStatus.CANCELLED;
     await this.intentsRepo.save(intent);
     return this.serialize(intent);
@@ -267,12 +287,33 @@ export class PaymentsService {
 
   providers() {
     return {
-      strategy: 'phone_nfc',
+      strategy: 'smartpos',
       description:
-        'PDV no celular com NFC: pulseira do cliente + pagamento PIX ou cartão por aproximação (SoftPOS)',
+        'PDV na maquininha: pulseira NFC do cliente + PIX/débito/crédito no terminal (Cielo Smart, Mercado Pago Point ou PagBank).',
       pix: { provider: this.pix.mode },
       softpos: { provider: this.softpos.mode },
-      channels: ['pix', 'card_contactless'],
+      channels: ['pix', 'card_contactless', 'terminal'],
+      terminals: {
+        cielo: {
+          name: 'Cielo Smart',
+          integration: 'deep_link',
+          docs: 'https://docs.cielo.com.br/cielo-smart/docs/integracao-via-deep-link',
+          flavor: 'cielo',
+          ready: this.softpos.cieloReady,
+        },
+        mercadopago: {
+          name: 'Mercado Pago Point',
+          integration: 'point_smartapp',
+          docs: 'https://www.mercadopago.com.br/developers/pt/docs/mp-point/overview',
+          flavor: 'mercadopago',
+          ready: this.softpos.mercadoPagoReady,
+        },
+        pagbank: {
+          name: 'PagBank SmartPOS',
+          integration: 'plugpag',
+          ready: this.softpos.mode === 'pagbank',
+        },
+      },
     };
   }
 }

@@ -24,7 +24,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PagBank SmartPOS · Moderninha"
+            android:text="@string/login_terminal"
             android:textColor="@color/muted"
             android:layout_marginBottom="24dp" />
 
@@ -70,7 +70,7 @@
             android:id="@+id/inputActivation"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="Código ativação PagBank (opcional no demo)"
+            android:hint="@string/hint_activation"
             android:inputType="text"
             android:textColor="@color/text"
             android:textColorHint="@color/muted"

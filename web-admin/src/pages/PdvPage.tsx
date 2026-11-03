@@ -12,7 +12,11 @@ export function PdvPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Terminais PDV</h2>
+      <h2 className="text-2xl font-bold mb-2">Terminais PDV</h2>
+      <p className="mb-6 text-sm text-slate-400">
+        Instale o APK do flavor da maquininha: Cielo Smart, Mercado Pago Point ou PagBank.
+        Guias em Integrações e na pasta <code>docs/</code>.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {terminals?.map(
           (t: {

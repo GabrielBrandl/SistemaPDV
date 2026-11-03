@@ -11,4 +11,12 @@ body {
   @apply bg-slate-950 text-slate-100 antialiased;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button,
+a,
+input,
+select {
+  font-size: max(1rem, 16px);
 }

@@ -5,9 +5,6 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 
-fun ByteArray.toHexString(): String =
-    joinToString("") { "%02X".format(it) }
-
 class NfcHelper(
     private val activity: Activity,
     private val onUid: (String) -> Unit,

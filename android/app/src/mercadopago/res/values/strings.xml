@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDV Point</string>
+    <string name="login_terminal">Mercado Pago Point Smart</string>
+    <string name="hint_activation">Serial / terminal_id do Point (opcional)</string>
+</resources>

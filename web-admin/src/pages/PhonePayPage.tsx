@@ -127,7 +127,7 @@ export function PhonePayPage() {
       <header className="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/95 px-4 py-3 flex items-center justify-between">
         <div>
           <p className="text-xs text-slate-400 inline-flex items-center gap-1">
-            <Smartphone size={12} /> Pagamento no celular
+            <Smartphone size={12} /> Pagamento · Cielo / Point / PagBank
           </p>
           <h1 className="text-lg font-bold text-amber-400">
             Comanda #{comanda?.numero ?? '…'}
@@ -189,7 +189,7 @@ export function PhonePayPage() {
             >
               <CreditCard size={32} />
               Débito por aproximação
-              <span className="text-xs font-normal opacity-80">NFC do celular (SoftPOS)</span>
+              <span className="text-xs font-normal opacity-80">Maquininha ou NFC</span>
             </button>
             <button
               onClick={() => cardMutation.mutate('credito')}
@@ -198,7 +198,7 @@ export function PhonePayPage() {
             >
               <CreditCard size={32} />
               Crédito por aproximação
-              <span className="text-xs font-normal opacity-80">NFC do celular (SoftPOS)</span>
+              <span className="text-xs font-normal opacity-80">Maquininha ou NFC</span>
             </button>
           </div>
         ) : intent.channel === 'pix' ? (

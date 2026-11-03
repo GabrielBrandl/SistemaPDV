@@ -48,10 +48,9 @@ class LoginActivity : AppCompatActivity() {
                     SessionStore.userRole = res.user.role
 
                     if (!BuildConfig.DEMO_PAYMENT && activation.isNotBlank()) {
-                        PaymentGatewayFactory.usePagBank()
                         val act = PaymentGatewayFactory.get().activate(activation)
                         if (!act.success) {
-                            showError(act.message ?: "Falha ao ativar terminal PagBank")
+                            showError(act.message ?: "Falha ao ativar o terminal")
                             binding.btnLogin.isEnabled = true
                             return@launch
                         }

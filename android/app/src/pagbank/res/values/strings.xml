@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PDV PagBank</string>
+    <string name="login_terminal">PagBank SmartPOS · Moderninha</string>
+    <string name="hint_activation">Código de ativação PagBank</string>
+</resources>

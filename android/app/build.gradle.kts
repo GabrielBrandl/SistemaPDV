@@ -16,6 +16,11 @@ android {
         // Produção EasyPanel (maquininha). Emulador local: http://10.0.2.2:3001/api/v1
         buildConfigField("String", "API_BASE_URL", "\"https://sistema-pdv.9nb5f0.easypanel.host/api/v1\"")
         buildConfigField("String", "PAGBANK_ACTIVATION_CODE", "\"\"")
+        buildConfigField("String", "CIELO_CLIENT_ID", "\"\"")
+        buildConfigField("String", "CIELO_ACCESS_TOKEN", "\"\"")
+        buildConfigField("boolean", "HAS_CIELO", "false")
+        buildConfigField("boolean", "HAS_MERCADOPAGO", "false")
+        buildConfigField("String", "PAYMENT_PROVIDER", "\"demo\"")
     }
 
     flavorDimensions += "store"
@@ -26,11 +31,41 @@ android {
             versionNameSuffix = "-demo"
             buildConfigField("boolean", "DEMO_PAYMENT", "true")
             buildConfigField("boolean", "HAS_PLUGPAG", "false")
+            buildConfigField("boolean", "HAS_CIELO", "false")
+            buildConfigField("boolean", "HAS_MERCADOPAGO", "false")
+            buildConfigField("String", "PAYMENT_PROVIDER", "\"demo\"")
         }
         create("pagbank") {
             dimension = "store"
             buildConfigField("boolean", "DEMO_PAYMENT", "false")
             buildConfigField("boolean", "HAS_PLUGPAG", "true")
+            buildConfigField("boolean", "HAS_CIELO", "false")
+            buildConfigField("boolean", "HAS_MERCADOPAGO", "false")
+            buildConfigField("String", "PAYMENT_PROVIDER", "\"pagbank\"")
+        }
+        create("cielo") {
+            dimension = "store"
+            applicationIdSuffix = ".cielo"
+            versionNameSuffix = "-cielo"
+            buildConfigField("boolean", "DEMO_PAYMENT", "false")
+            buildConfigField("boolean", "HAS_PLUGPAG", "false")
+            buildConfigField("boolean", "HAS_CIELO", "true")
+            buildConfigField("boolean", "HAS_MERCADOPAGO", "false")
+            buildConfigField("String", "PAYMENT_PROVIDER", "\"cielo\"")
+            val cieloId = System.getenv("CIELO_CLIENT_ID") ?: ""
+            val cieloTok = System.getenv("CIELO_ACCESS_TOKEN") ?: ""
+            buildConfigField("String", "CIELO_CLIENT_ID", "\"$cieloId\"")
+            buildConfigField("String", "CIELO_ACCESS_TOKEN", "\"$cieloTok\"")
+        }
+        create("mercadopago") {
+            dimension = "store"
+            applicationIdSuffix = ".mp"
+            versionNameSuffix = "-mp"
+            buildConfigField("boolean", "DEMO_PAYMENT", "false")
+            buildConfigField("boolean", "HAS_PLUGPAG", "false")
+            buildConfigField("boolean", "HAS_CIELO", "false")
+            buildConfigField("boolean", "HAS_MERCADOPAGO", "true")
+            buildConfigField("String", "PAYMENT_PROVIDER", "\"mercadopago\"")
         }
     }
 
@@ -60,6 +95,12 @@ android {
         }
         getByName("demo") {
             java.srcDir("src/demo/java")
+        }
+        getByName("cielo") {
+            java.srcDir("src/cielo/java")
+        }
+        getByName("mercadopago") {
+            java.srcDir("src/mercadopago/java")
         }
     }
 }

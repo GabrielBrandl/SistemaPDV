@@ -6,9 +6,13 @@ import { createHash, randomBytes } from 'crypto';
 export class PixProvider {
   constructor(private readonly config: ConfigService) {}
 
-  get mode(): 'demo' | 'mercadopago' | 'pagbank' {
-    const m = (this.config.get<string>('PIX_PROVIDER') || 'demo').toLowerCase();
-    if (m === 'mercadopago' || m === 'pagbank') return m;
+  get mode(): 'demo' | 'mercadopago' | 'pagbank' | 'cielo' {
+    return this.resolve(this.config.get<string>('PIX_PROVIDER'));
+  }
+
+  resolve(override?: string | null): 'demo' | 'mercadopago' | 'pagbank' | 'cielo' {
+    const m = (override || this.config.get<string>('PIX_PROVIDER') || 'demo').toLowerCase();
+    if (m === 'mercadopago' || m === 'pagbank' || m === 'cielo') return m;
     return 'demo';
   }
 
@@ -21,6 +25,7 @@ export class PixProvider {
     valor: number;
     comandaId: string;
     descricao: string;
+    provider?: string;
   }): Promise<{
     provider: string;
     providerRef: string;
@@ -31,10 +36,18 @@ export class PixProvider {
     const providerRef = `pix_${randomBytes(8).toString('hex')}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    if (this.mode !== 'demo') {
-      // Hook para integração real — por enquanto cai no demo com provider marcado
-      // MP: POST /v1/payments com payment_method_id=pix
-      // PagBank: charge PIX QR
+    const mode = this.resolve(input.provider);
+
+    if (mode === 'mercadopago') {
+      const token = this.config.get<string>('MERCADOPAGO_ACCESS_TOKEN');
+      if (token) {
+        try {
+          const created = await this.createMercadoPagoPix(token, input);
+          if (created) return created;
+        } catch {
+          /* cai no BR Code local se a API falhar (homologação) */
+        }
+      }
     }
 
     const copiaCola = this.buildDemoEmv({
@@ -46,11 +59,47 @@ export class PixProvider {
     });
 
     return {
-      provider: this.mode,
+      provider: mode,
       providerRef,
       copiaCola,
       qrPayload: copiaCola,
       expiresAt,
+    };
+  }
+
+  private async createMercadoPagoPix(
+    token: string,
+    input: { valor: number; comandaId: string; descricao: string },
+  ) {
+    const res = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': input.comandaId,
+      },
+      body: JSON.stringify({
+        transaction_amount: Number(input.valor.toFixed(2)),
+        description: input.descricao.slice(0, 120),
+        payment_method_id: 'pix',
+        payer: { email: 'cliente@pdv.local' },
+      }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      id?: number;
+      point_of_interaction?: {
+        transaction_data?: { qr_code?: string; qr_code_base64?: string };
+      };
+    };
+    const copiaCola = data.point_of_interaction?.transaction_data?.qr_code;
+    if (!copiaCola || !data.id) return null;
+    return {
+      provider: 'mercadopago' as const,
+      providerRef: String(data.id),
+      copiaCola,
+      qrPayload: copiaCola,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
     };
   }
 

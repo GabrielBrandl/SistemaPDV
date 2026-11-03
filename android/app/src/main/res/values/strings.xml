@@ -11,4 +11,6 @@
     <string name="btn_pay_credit">Crédito</string>
     <string name="btn_release">Liberar saída</string>
     <string name="nfc_hint">Aproxime a pulseira NFC</string>
+    <string name="login_terminal">SmartPOS · Cielo · Mercado Pago · PagBank</string>
+    <string name="hint_activation">Código de ativação do terminal (opcional no demo)</string>
 </resources>

@@ -49,8 +49,44 @@ export function IntegrationsPage() {
     <div>
       <h2 className="text-2xl font-bold mb-2">Integrações / APIs</h2>
       <p className="text-slate-400 text-sm mb-6">
-        Conecte sistemas externos via API Key e webhooks (eventos de comanda, pagamento, NFC)
+        Conecte maquininhas (Cielo Smart, Mercado Pago Point, PagBank) e sistemas externos
       </p>
+
+      <div className="mb-8 grid gap-4 md:grid-cols-3">
+        <a
+          href="https://www.cielo.com.br/"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-amber-500/40"
+        >
+          <p className="font-semibold text-amber-300">Cielo Smart</p>
+          <p className="mt-2 text-sm text-slate-400">
+            App flavor <code>cielo</code> com Deep Link <code>lio://payment</code>. Portal de
+            desenvolvedores: Client ID + Access Token.
+          </p>
+          <p className="mt-3 text-xs text-slate-500">docs/INSTALACAO_MAQUININHA_CIELO.md</p>
+        </a>
+        <a
+          href="https://www.mercadopago.com.br/developers/pt"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-amber-500/40"
+        >
+          <p className="font-semibold text-sky-300">Mercado Pago Point</p>
+          <p className="mt-2 text-sm text-slate-400">
+            Order API <code>/v1/orders</code> type=point + flavor <code>mercadopago</code> no
+            terminal Smart.
+          </p>
+          <p className="mt-3 text-xs text-slate-500">docs/INSTALACAO_MAQUININHA_MERCADOPAGO.md</p>
+        </a>
+        <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <p className="font-semibold text-emerald-300">PagBank SmartPOS</p>
+          <p className="mt-2 text-sm text-slate-400">
+            Flavor <code>pagbank</code> com PlugPag na Moderninha. Código de ativação no login.
+          </p>
+          <p className="mt-3 text-xs text-slate-500">docs/INSTALACAO_MAQUININHA_PAGBANK.md</p>
+        </div>
+      </div>
 
       <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 mb-6 max-w-2xl">
         <h3 className="font-semibold mb-3">Nova integração</h3>

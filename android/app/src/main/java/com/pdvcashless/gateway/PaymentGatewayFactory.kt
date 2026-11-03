@@ -13,18 +13,27 @@ object PaymentGatewayFactory {
 
     fun get(): PaymentGateway {
         gateway?.let { return it }
-        val g =
-            if (BuildConfig.DEMO_PAYMENT || !BuildConfig.HAS_PLUGPAG) {
-                DemoGateway()
-            } else {
-                PagBankGateway(appContext)
-            }
+        val g = when {
+            BuildConfig.DEMO_PAYMENT -> DemoGateway()
+            BuildConfig.HAS_PLUGPAG -> PagBankGateway(appContext)
+            BuildConfig.HAS_CIELO -> CieloGateway()
+            BuildConfig.HAS_MERCADOPAGO -> MercadoPagoGateway()
+            else -> DemoGateway()
+        }
         gateway = g
         return g
     }
 
     fun usePagBank() {
         gateway = PagBankGateway(appContext)
+    }
+
+    fun useCielo() {
+        gateway = CieloGateway()
+    }
+
+    fun useMercadoPago() {
+        gateway = MercadoPagoGateway()
     }
 
     fun useDemo() {

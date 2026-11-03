@@ -44,17 +44,17 @@ export function App() {
             }
           />
 
-          {/* Painéis fullscreen (celular / saída) */}
+          {/* Telas fullscreen (maquininha / saída / pagamento) */}
           <Route element={<ProtectedRoute bare />}>
             <Route path="/saida" element={<ExitGatePage />} />
             <Route path="/pagar" element={<PhonePayPage />} />
+            <Route path="/pos" element={<PosPage />} />
           </Route>
 
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/admin" element={<AdminControlPage />} />
             <Route path="/cadastro" element={<CadastroPage />} />
-            <Route path="/pos" element={<PosPage />} />
             <Route path="/platform" element={<PlatformDashboardPage />} />
             <Route path="/platform/empresas" element={<TenantsPage />} />
             <Route

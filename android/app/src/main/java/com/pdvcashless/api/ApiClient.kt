@@ -36,6 +36,9 @@ interface PdvApi {
     @POST("payments/card")
     suspend fun createCard(@Body body: CreateCardPaymentRequest): PaymentIntentDto
 
+    @GET("payments/{id}")
+    suspend fun getPayment(@Path("id") id: String): PaymentIntentDto
+
     @POST("payments/{id}/confirm")
     suspend fun confirmPayment(
         @Path("id") id: String,

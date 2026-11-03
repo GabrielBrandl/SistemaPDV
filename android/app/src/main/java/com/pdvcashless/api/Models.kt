@@ -65,10 +65,12 @@ data class AddItemDto(val produto_id: String, val qtd: Int)
 data class CreateCardPaymentRequest(
     val comanda_id: String,
     val forma: String,
+    val provider: String? = null,
 )
 
 data class CreatePixPaymentRequest(
     val comanda_id: String,
+    val provider: String? = null,
 )
 
 data class PaymentIntentDto(

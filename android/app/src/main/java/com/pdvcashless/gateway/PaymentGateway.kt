@@ -11,13 +11,15 @@ data class PaymentResult(
     val transactionId: String?,
     val message: String?,
     val rawCode: Int? = null,
+    /** Cobrança já foi ao terminal (Point API). O app deve consultar o backend. */
+    val awaitRemote: Boolean = false,
 )
 
 interface PaymentGateway {
-    /** Ativa o terminal PagBank (código de ativação do estabelecimento). */
+    /** Ativa o terminal (código PagBank / credenciais Cielo / login Point). */
     suspend fun activate(activationCode: String): PaymentResult
 
-    /** Débito/crédito/PIX via PlugPag no terminal SmartPOS. */
+    /** Débito/crédito/PIX no terminal (PlugPag, Cielo Deep Link ou Point). */
     suspend fun doPayment(
         amountCents: Int,
         type: PaymentType,

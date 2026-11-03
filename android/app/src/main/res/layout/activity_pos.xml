@@ -4,39 +4,43 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/bg"
-    android:padding="12dp">
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/txtHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="PDV · Aproxime a pulseira"
+        android:text="Aproxime a pulseira"
         android:textColor="@color/amber"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtComanda"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Aguardando NFC"
         android:textColor="@color/muted"
+        android:textSize="16sp"
         android:layout_marginBottom="8dp" />
 
     <EditText
         android:id="@+id/inputUid"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="56dp"
         android:hint="UID NFC"
         android:textColor="@color/text"
         android:textColorHint="@color/muted"
         android:background="@color/surface"
-        android:padding="10dp" />
+        android:padding="12dp"
+        android:textSize="16sp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnTap"
+        style="@style/PosButton"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Ler / Abrir comanda"
+        android:layout_height="64dp"
+        android:text="Ler pulseira"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/amber"
         android:textColor="@color/bg" />
@@ -53,9 +57,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Total: R$ 0,00"
-        android:textColor="@color/text"
-        android:textSize="22sp"
+        android:textColor="@color/amber"
+        android:textSize="28sp"
         android:textStyle="bold"
+        android:gravity="center"
         android:paddingVertical="8dp" />
 
     <LinearLayout
@@ -65,10 +70,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPay"
+            style="@style/PosButton"
             android:layout_width="0dp"
-            android:layout_height="64dp"
+            android:layout_height="72dp"
             android:layout_weight="1"
-            android:text="Pagar"
+            android:text="PAGAR"
             android:backgroundTint="@color/teal"
             android:textColor="@android:color/white"
             android:enabled="false" />
@@ -76,11 +82,12 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExitMode"
             android:layout_width="0dp"
-            android:layout_height="64dp"
+            android:layout_height="72dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="Saída"
             android:backgroundTint="@color/surface"
-            android:textColor="@color/text" />
+            android:textColor="@color/text"
+            android:textSize="18sp" />
     </LinearLayout>
 </LinearLayout>

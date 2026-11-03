@@ -1,0 +1,41 @@
+PDV Cashless — Cielo Smart e Mercado Pago Point
+================================================
+
+APKs prontos nesta pasta:
+
+  PDV-Cielo.apk        → instale NA maquininha Cielo Smart (LIO / DX)
+  PDV-MercadoPago.apk  → instale NA maquininha Mercado Pago Point Smart
+
+Não instale os dois no mesmo terminal. Cada máquina recebe o APK dela.
+
+
+1. Cielo Smart
+--------------
+1. Ligue o Wi-Fi do terminal
+2. Copie PDV-Cielo.apk (USB, e-mail ou adb install PDV-Cielo.apk)
+3. Abra o app "PDV Cielo"
+4. URL da API:
+   https://sistema-pdv.9nb5f0.easypanel.host/api/v1
+5. Login do operador
+
+Para cobrança real no cartão: Client ID + Access Token no portal Cielo
+(docs/INSTALACAO_MAQUININHA_CIELO.md)
+
+
+2. Mercado Pago Point
+---------------------
+1. Terminal em modo PDV
+2. Instale PDV-MercadoPago.apk
+3. Abra o app "PDV Point"
+4. Mesma URL da API e login do operador
+
+Para cobrança real: Access Token + terminal_id no EasyPanel
+(docs/INSTALACAO_MAQUININHA_MERCADOPAGO.md)
+
+
+3. Uso
+------
+Aproxime a pulseira NFC → lance produtos → PAGAR → PIX / Débito / Crédito
+
+Sem as chaves do portal, o PDV abre e a comanda funciona.
+O cartão só autoriza depois da homologação Cielo / Point.

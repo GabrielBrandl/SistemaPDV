@@ -78,22 +78,20 @@ APIs admin: `GET /admin/overview`, `GET /admin/comandas`
 
 ## Estratégia de hardware
 
-**PDV em maquininha PagBank SmartPOS (Moderninha)** — app Android nativo com PlugPag  
-(guia: `docs/INSTALACAO_MAQUININHA_PAGBANK.pdf`)
+O PDV roda **na maquininha** (app Android nativo). Três adquirentes:
 
-Alternativa de treino: celular/Chrome (guia antigo em `docs/INSTALACAO_CELULAR.pdf`).
+| Maquininha | Flavor Android | Integração | Guia |
+|------------|----------------|------------|------|
+| Cielo Smart (LIO / DX) | `cielo` | Deep Link `lio://payment` | `docs/INSTALACAO_MAQUININHA_CIELO.md` |
+| Mercado Pago Point | `mercadopago` | Order API `/v1/orders` + app Point | `docs/INSTALACAO_MAQUININHA_MERCADOPAGO.md` |
+| PagBank SmartPOS | `pagbank` | PlugPag | `docs/INSTALACAO_MAQUININHA_PAGBANK.md` |
 
 1. Backend online (HTTPS)
-2. App `android/` flavor **pagbank**
-3. Terminal PagBank + código de ativação
-4. Pulseira NFC + PIX/débito/crédito via PlugPag
-5. Liberação na saída
+2. APK do flavor da sua maquininha
+3. Pulseira NFC + PIX / débito / crédito no terminal
+4. Liberação na saída
 
-### SoftPOS / PlugPag
-- Flavor `demo`: pagamento simulado  
-- Flavor `pagbank`: SDK `PlugPagServiceWrapper` na Moderninha  
-
-APIs: `POST /payments/pix`, `POST /payments/card`, `POST /payments/:id/confirm`
+APIs: `POST /payments/pix`, `POST /payments/card`, `GET /payments/:id`, `POST /payments/:id/confirm`
 
 ## Onboarding
 
@@ -133,11 +131,10 @@ Header opcional para super admin: `X-Tenant-Id`
 - Status dos terminais PDV
 - Consulta de documentos fiscais
 
-### Android (scaffold)
-- Estrutura base Kotlin + Jetpack Compose
-- Leitura NFC (NfcAdapter)
-- Interface PaymentGateway para Stone/Cielo/PagSeguro
-- Room Database + Outbox Pattern (estrutura)
+### Android (SmartPOS)
+- Flavors `demo`, `pagbank`, `cielo`, `mercadopago`
+- NFC da pulseira + cardápio em botões grandes
+- Cielo Deep Link, Point API/intent, PlugPag PagBank
 
 ## Endpoints Principais
 
@@ -152,12 +149,15 @@ Header opcional para super admin: `X-Tenant-Id`
 | POST | `/orders/{id}/checkout` | Finalizar venda |
 | GET | `/events/{id}/dashboard` | Dashboard do evento |
 
-## Próximas Fases
+## Homologação das maquininhas
 
-- **Fase 2:** App Android completo com SDKs das maquininhas
-- **Fase 3:** Dashboard com Supabase Realtime
-- **Fase 4:** Integração Focus NFe + homologação SEFAZ
-- **Fase 5:** Testes de carga, segurança e go-live
+Cielo e Mercado Pago **não instalam o site** no terminal. É o APK nativo + credenciais do portal:
+
+- Cielo: `CIELO_CLIENT_ID` + `CIELO_ACCESS_TOKEN` (portal de desenvolvedores)
+- Mercado Pago: `MERCADOPAGO_ACCESS_TOKEN` + `MERCADOPAGO_TERMINAL_ID` (Suas integrações)
+- PagBank: código de ativação PlugPag
+
+Sem essas chaves o fluxo de **comanda/NFC/UI** já funciona no flavor `demo`. O dinheiro real só entra depois da homologação de cada loja (Cielo Smart, Point, PagBank).
 
 ## Cartão NFC de Teste
 

@@ -6,10 +6,25 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Bind ao serviço PlugPag embarcado na Moderninha / SmartPOS PagBank -->
     <uses-permission android:name="br.com.uol.pagseguro.permission.PLUGPAGSERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="lio" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="mercadopago" />
+        </intent>
+        <intent>
+            <action android:name="com.mercadopago.PAYMENT" />
+        </intent>
+    </queries>
 
     <application
         android:name=".PdvApp"
@@ -20,6 +35,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SistemaPDV"
         android:usesCleartextTraffic="true">
+
+        <!-- Cielo Smart Deep Link: identifica o app como integração URI -->
+        <meta-data
+            android:name="cs_integration_type"
+            android:value="uri" />
 
         <activity
             android:name=".ui.LoginActivity"
@@ -45,8 +65,28 @@
 
         <activity
             android:name=".ui.PayActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <!-- Callback Cielo Smart: order://response -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="order"
+                    android:host="response" />
+            </intent-filter>
+            <!-- Callback Mercado Pago Point -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="pdvcashless"
+                    android:host="mp-point" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".ui.ExitActivity"
