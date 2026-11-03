@@ -1,0 +1,14 @@
+# HTTPS reverso — use com Caddy na frente do compose
+# APP_DOMAIN=pdv.seudominio.com.br
+
+{$APP_DOMAIN:sistema-pdv.129-121-39-17.sslip.io} {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy backend:3000
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+}

@@ -27,8 +27,11 @@ services:
       DB_SSL: "false"
       DATABASE_URL: postgresql://${DB_USER:-pdv}:${DB_PASSWORD:-pdv_secret}@postgres:5432/${DB_NAME:-pdv_nfc}?sslmode=disable
       JWT_SECRET: ${JWT_SECRET:-change_me}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_DAYS: ${JWT_REFRESH_DAYS:-14}
+      TYPEORM_SYNC: ${TYPEORM_SYNC:-true}
       PORT: "3000"
+      APP_DOMAIN: ${APP_DOMAIN:-}
       SUPABASE_URL: ${SUPABASE_URL:-}
       SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}

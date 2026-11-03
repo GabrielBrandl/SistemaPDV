@@ -145,6 +145,19 @@ export class SeedService implements OnModuleInit {
       }),
     );
 
+    const cashierPassword = await bcrypt.hash('caixa123', 10);
+    const cashierPin = await bcrypt.hash('1234', 10);
+    await this.usersRepo.save(
+      this.usersRepo.create({
+        email: 'caixa@pdv.local',
+        password: cashierPassword,
+        name: 'Caixa Recarga',
+        role: UserRole.CASHIER,
+        tenantId: tenant.id,
+        pinHash: cashierPin,
+      }),
+    );
+
     await this.usersRepo.save(
       this.usersRepo.create({
         email: 'saida@pdv.local',
