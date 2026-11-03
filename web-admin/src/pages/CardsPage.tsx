@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../services/api';
+import api, { getErrorMessage } from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { labelStatus } from '../shared/format';
+import { Button } from '../components/ui/Button';
+import { Money } from '../components/ui/Money';
 
 export function CardsPage() {
   const eventId = useAuthStore((s) => s.eventId);
@@ -32,6 +35,19 @@ export function CardsPage() {
       setNome('');
       queryClient.invalidateQueries({ queryKey: ['card-status'] });
     },
+  });
+
+  const [actionError, setActionError] = useState('');
+
+  const statusMutation = useMutation({
+    mutationFn: (action: 'block' | 'unblock') =>
+      api.post(`/cards/${searchUid}/${action}`),
+    onSuccess: () => {
+      setActionError('');
+      queryClient.invalidateQueries({ queryKey: ['card-status', searchUid] });
+    },
+    onError: (err) =>
+      setActionError(getErrorMessage(err, 'Falha ao alterar status do cartão')),
   });
 
   return (
@@ -87,11 +103,38 @@ export function CardsPage() {
                 {cardStatus.nome_cliente ?? '—'}
               </p>
               <p>
-                <span className="text-slate-400">Status:</span> {cardStatus.status}
+                <span className="text-slate-400">Status:</span>{' '}
+                {labelStatus(cardStatus.status)}
               </p>
-              <p className="text-lg font-bold text-amber-400">
-                Saldo: R$ {Number(cardStatus.saldo_disponivel).toFixed(2)}
+              <p className="text-lg font-bold">
+                <span className="text-amber-400">Saldo: </span>
+                <Money value={cardStatus.saldo_disponivel} />
               </p>
+              {actionError && (
+                <p className="text-sm text-red-300">{actionError}</p>
+              )}
+              <div className="flex gap-2 pt-2">
+                {cardStatus.status === 'blocked' ? (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    loading={statusMutation.isPending}
+                    onClick={() => statusMutation.mutate('unblock')}
+                  >
+                    Desbloquear
+                  </Button>
+                ) : (
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    loading={statusMutation.isPending}
+                    disabled={cardStatus.status !== 'active'}
+                    onClick={() => statusMutation.mutate('block')}
+                  >
+                    Bloquear
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </div>

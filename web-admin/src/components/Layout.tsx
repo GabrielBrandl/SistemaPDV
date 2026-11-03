@@ -25,22 +25,45 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useAuthStore } from '../store/auth';
+import { logoutRemote } from '../services/api';
+import { NAV_BY_PERMISSION, can, normalizeRole } from '../shared/permissions';
 
 const COLLAPSE_KEY = 'pdv-sidebar-collapsed';
 
 type NavItem = { to: string; label: string; icon: LucideIcon };
 
+const NAV_ICONS: Record<string, LucideIcon> = {
+  '/platform': LayoutDashboard,
+  '/tenants': Building2,
+  '/precos': Tags,
+  '/equipe': Users,
+  '/billing': Wallet,
+  '/admin': Shield,
+  '/cadastro': UserPlus,
+  '/t/pos': Store,
+  '/pos': Store,
+  '/t/saida': DoorOpen,
+  '/saida': DoorOpen,
+  '/': LayoutDashboard,
+  '/cards': CreditCard,
+  '/t/recarga': RefreshCw,
+  '/recharge': RefreshCw,
+  '/products': ShoppingBag,
+  '/reports': Receipt,
+  '/pdv': Radio,
+  '/fiscal': Package,
+  '/integrations': Plug,
+};
+
+const CASH_NAV = { to: '/t/caixa', label: 'Caixa', icon: Wallet };
+
 export function Layout({ children }: { children: React.ReactNode }) {
-  const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
   const tenant = useAuthStore((s) => s.tenant);
   const impersonateTenantId = useAuthStore((s) => s.impersonateTenantId);
   const setImpersonateTenantId = useAuthStore((s) => s.setImpersonateTenantId);
   const navigate = useNavigate();
   const location = useLocation();
-  const isSuper = user?.role === 'super_admin';
-  const isTenantAdmin = user?.role === 'admin';
-  const showOpsNav = !isSuper || !!impersonateTenantId;
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
@@ -77,56 +100,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
     };
   }, [mobileOpen]);
 
-  const platformLinks: NavItem[] = isSuper
-    ? [
-        { to: '/platform', label: 'Plataforma', icon: LayoutDashboard },
-        { to: '/tenants', label: 'Empresas', icon: Building2 },
-        { to: '/precos', label: 'Planos', icon: Tags },
-      ]
-    : [];
-
-  const tenantAdminLinks: NavItem[] =
-    isTenantAdmin || (isSuper && !!impersonateTenantId)
-      ? [
-          { to: '/equipe', label: 'Equipe', icon: Users },
-          { to: '/billing', label: 'Assinatura', icon: Wallet },
-        ]
-      : [];
-
-  const opsLinks: NavItem[] = showOpsNav
-    ? [
-        ...(isTenantAdmin || (isSuper && !!impersonateTenantId)
-          ? [{ to: '/admin', label: 'Controle Admin', icon: Shield }]
-          : []),
-        { to: '/cadastro', label: 'Cadastro Cliente', icon: UserPlus },
-        { to: '/pos', label: 'PDV Comanda', icon: Store },
-        { to: '/saida', label: 'Controle de Saída', icon: DoorOpen },
-        { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-        { to: '/cards', label: 'Cartões NFC', icon: CreditCard },
-        { to: '/recharge', label: 'Recarga', icon: RefreshCw },
-        { to: '/products', label: 'Cardápio', icon: ShoppingBag },
-        { to: '/reports', label: 'Relatórios', icon: Receipt },
-        { to: '/pdv', label: 'Terminais PDV', icon: Radio },
-        { to: '/fiscal', label: 'Emitidor NFC-e', icon: Package },
-        ...(isTenantAdmin || (isSuper && !!impersonateTenantId)
-          ? [{ to: '/integrations', label: 'Integrações', icon: Plug }]
-          : []),
-      ]
-    : [];
+  const roleKey = user?.role_normalized ?? user?.role;
+  const isSuper = normalizeRole(roleKey) === 'platform_admin';
 
   const links: NavItem[] = [
-    ...platformLinks,
-    ...tenantAdminLinks,
-    ...opsLinks,
+    ...NAV_BY_PERMISSION.filter((item) => can(roleKey, item.permission)).map(
+      (item) => ({
+        to: item.to,
+        label: item.label,
+        icon: NAV_ICONS[item.to] ?? Package,
+      }),
+    ),
+    ...(can(roleKey, 'cash.open') ? [CASH_NAV] : []),
   ];
-
   const exitTenant = () => {
     setImpersonateTenantId(null);
     navigate('/platform');
   };
 
-  const doLogout = () => {
-    logout();
+  const doLogout = async () => {
+    await logoutRemote();
     navigate('/login');
   };
 

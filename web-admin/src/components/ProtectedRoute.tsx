@@ -1,20 +1,58 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
 import { Layout } from './Layout';
+import { ForbiddenPage } from '../pages/ForbiddenPage';
+import {
+  can,
+  homePathForRole,
+  normalizeRole,
+  type Permission,
+} from '../shared/permissions';
 
-export function ProtectedRoute({ bare = false }: { bare?: boolean }) {
+/** Papéis operacionais: ao acessar rota proibida voltam para o terminal deles */
+const RESTRICTED_ROLES = ['exit', 'cashier', 'bartender', 'platform_admin'];
+const EXIT_PATHS = ['/t/saida', '/saida'];
+
+export function ProtectedRoute({
+  bare = false,
+  permission,
+}: {
+  bare?: boolean;
+  permission?: Permission;
+}) {
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
 
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token || !user) return <Navigate to="/login" replace />;
 
-  // Operador de saída só acessa /saida
-  if (user?.role === 'exit' && location.pathname !== '/saida') {
-    return <Navigate to="/saida" replace />;
+  const roleKey = user.role_normalized ?? user.role;
+  const role = normalizeRole(roleKey);
+  const home = user.home_path ?? homePathForRole(roleKey);
+  const pathname = location.pathname;
+
+  // Operador de saída só acessa a tela de saída
+  if (role === 'exit' && !EXIT_PATHS.includes(pathname)) {
+    return <Navigate to="/t/saida" replace />;
   }
 
-  if (bare || user?.role === 'exit') {
+  // Terminais /t/* e operador de saída usam tela cheia, sem menu
+  const withShell = !(bare || pathname.startsWith('/t/') || role === 'exit');
+
+  if (permission && !can(roleKey, permission)) {
+    if (role && RESTRICTED_ROLES.includes(role) && home !== pathname) {
+      return <Navigate to={home} replace />;
+    }
+    return withShell ? (
+      <Layout>
+        <ForbiddenPage />
+      </Layout>
+    ) : (
+      <ForbiddenPage />
+    );
+  }
+
+  if (!withShell) {
     return <Outlet />;
   }
 
@@ -34,7 +72,7 @@ export function PublicOrAuthedLayout({
   const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
 
-  if (token && user?.role !== 'exit') {
+  if (token && normalizeRole(user?.role_normalized ?? user?.role) !== 'exit') {
     return <Layout>{children}</Layout>;
   }
 

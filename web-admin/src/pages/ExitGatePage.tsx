@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, LogOut, Nfc, ShieldAlert, XCircle } from 'lucide-react';
-import api from '../services/api';
+import api, { logoutRemote } from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { normalizeRole } from '../shared/permissions';
 
 type ExitCheck = {
   decisao: 'liberar' | 'bloquear' | 'ja_liberado';
@@ -27,8 +28,8 @@ type ExitCheck = {
 };
 
 export function ExitGatePage() {
-  const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
+  const role = normalizeRole(user?.role_normalized ?? user?.role);
   const queryClient = useQueryClient();
   const [uid, setUid] = useState('04A3B2112233');
   const [check, setCheck] = useState<ExitCheck | null>(null);
@@ -133,7 +134,7 @@ export function ExitGatePage() {
           <p className="text-xs text-slate-400">{user?.name} · verifique pagamento antes de liberar</p>
         </div>
         <div className="flex gap-2">
-          {(user?.role === 'admin' || user?.role === 'super_admin') && (
+          {(role === 'tenant_admin' || role === 'platform_admin') && (
             <a
               href="/admin"
               className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm text-amber-300"
@@ -152,8 +153,9 @@ export function ExitGatePage() {
           </button>
           <button
             onClick={() => {
-              logout();
-              window.location.href = '/login';
+              void logoutRemote().then(() => {
+                window.location.href = '/login';
+              });
             }}
             className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm text-red-300"
           >
@@ -277,7 +279,7 @@ export function ExitGatePage() {
                 </button>
               )}
 
-              {check.decisao === 'bloquear' && user?.role !== 'exit' && (
+              {check.decisao === 'bloquear' && role !== 'exit' && (
                 <div className="mt-4 space-y-2">
                   <input
                     placeholder="Motivo da liberação forçada (obrigatório)"
@@ -295,7 +297,7 @@ export function ExitGatePage() {
                 </div>
               )}
 
-              {check.decisao === 'bloquear' && user?.role === 'exit' && (
+              {check.decisao === 'bloquear' && role === 'exit' && (
                 <p className="mt-3 text-sm text-red-200">
                   Envie o cliente ao caixa para pagar (PIX / débito / crédito) e só depois libere.
                 </p>

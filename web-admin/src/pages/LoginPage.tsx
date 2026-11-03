@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { getErrorMessage } from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { homePathForRole, normalizeRole } from '../shared/permissions';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,31 +19,27 @@ export function LoginPage() {
     setError('');
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      setAuth(data.access_token, data.user, data.tenant);
+      setAuth(data.access_token, data.user, data.tenant, data.refresh_token);
 
-      if (data.user.role === 'super_admin') {
-        navigate('/platform');
-        return;
+      const roleKey = data.user.role_normalized ?? data.user.role;
+      if (normalizeRole(roleKey) !== 'platform_admin') {
+        try {
+          const events = await api.get('/events');
+          if (events.data.length > 0) {
+            setEventId(events.data[0].id);
+          }
+        } catch {
+          /* perfis sem acesso a eventos seguem sem evento selecionado */
+        }
       }
 
-      if (data.user.role === 'exit') {
-        navigate('/saida');
-        return;
-      }
-
-      const events = await api.get('/events');
-      if (events.data.length > 0) {
-        setEventId(events.data[0].id);
-      }
-
-      if (data.user.role === 'admin') {
-        navigate('/admin');
-        return;
-      }
-
-      navigate('/pos');
-    } catch {
-      setError('Credenciais inválidas ou tenant suspenso');
+      navigate(data.user.home_path ?? homePathForRole(roleKey), {
+        replace: true,
+      });
+    } catch (err) {
+      setError(
+        getErrorMessage(err, 'Credenciais inválidas ou tenant suspenso'),
+      );
     } finally {
       setLoading(false);
     }

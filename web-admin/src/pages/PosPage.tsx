@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { can } from '../shared/permissions';
 
 type Product = {
   id: string;
@@ -312,7 +313,7 @@ export function PosPage() {
   return (
     <div className="flex h-dvh flex-col bg-slate-950 text-slate-100">
       <header className="flex shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-950 px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
-        {user?.role !== 'operator' && (
+        {can(user?.role_normalized ?? user?.role, 'reports.view') && (
           <Link
             to="/"
             className="rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-slate-300"

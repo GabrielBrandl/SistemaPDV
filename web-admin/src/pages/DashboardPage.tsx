@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import api from '../services/api';
 import { useAuthStore } from '../store/auth';
+import { formatBRL } from '../shared/format';
 
 export function DashboardPage() {
   const eventId = useAuthStore((s) => s.eventId);
@@ -36,12 +37,12 @@ export function DashboardPage() {
   if (isLoading) return <p className="text-slate-400">Carregando dashboard...</p>;
 
   const cards = [
-    { label: 'Vendas do Dia', value: `R$ ${Number(dashboard?.total_vendas ?? 0).toFixed(2)}` },
+    { label: 'Vendas do Dia', value: formatBRL(dashboard?.total_vendas) },
     { label: 'Transações', value: dashboard?.num_transacoes ?? 0 },
     { label: 'Cartões Ativos', value: dashboard?.cartoes_ativos ?? 0 },
     {
       label: 'Saldo Circulando',
-      value: `R$ ${Number(dashboard?.saldo_total_circulando ?? 0).toFixed(2)}`,
+      value: formatBRL(dashboard?.saldo_total_circulando),
     },
   ];
 

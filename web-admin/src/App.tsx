@@ -10,6 +10,8 @@ import { PlansPage } from './pages/PlansPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { CardsPage } from './pages/CardsPage';
 import { RechargePage } from './pages/RechargePage';
+import { TerminalRechargePage } from './pages/TerminalRechargePage';
+import { CashPage } from './pages/CashPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { PdvPage } from './pages/PdvPage';
@@ -44,17 +46,41 @@ export function App() {
             }
           />
 
-          {/* Telas fullscreen (maquininha / saída / pagamento) */}
-          <Route element={<ProtectedRoute bare />}>
+          {/* Terminais fullscreen (/t/*) */}
+          <Route element={<ProtectedRoute bare permission="pos.sell" />}>
+            <Route path="/t/pos" element={<PosPage />} />
+          </Route>
+          <Route element={<ProtectedRoute bare permission="recharge.create" />}>
+            <Route path="/t/recarga" element={<TerminalRechargePage />} />
+          </Route>
+          <Route element={<ProtectedRoute bare permission="exit.control" />}>
+            <Route path="/t/saida" element={<ExitGatePage />} />
+          </Route>
+          <Route element={<ProtectedRoute bare permission="cash.open" />}>
+            <Route path="/t/caixa" element={<CashPage />} />
+          </Route>
+
+          {/* Telas fullscreen legadas (maquininha / saída / pagamento) */}
+          <Route element={<ProtectedRoute bare permission="exit.control" />}>
             <Route path="/saida" element={<ExitGatePage />} />
+          </Route>
+          <Route element={<ProtectedRoute bare permission="pos.sell" />}>
             <Route path="/pagar" element={<PhonePayPage />} />
             <Route path="/pos" element={<PosPage />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
+          {/* Painel administrativo */}
+          <Route element={<ProtectedRoute permission="reports.view" />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="tenant.manage" />}>
             <Route path="/admin" element={<AdminControlPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="customers.manage" />}>
             <Route path="/cadastro" element={<CadastroPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="platform.manage" />}>
             <Route path="/platform" element={<PlatformDashboardPage />} />
             <Route path="/platform/empresas" element={<TenantsPage />} />
             <Route
@@ -62,14 +88,29 @@ export function App() {
               element={<CompanyDetailPage />}
             />
             <Route path="/tenants" element={<TenantsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="team.manage" />}>
             <Route path="/equipe" element={<TeamPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="billing.view" />}>
             <Route path="/billing" element={<BillingPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="cards.manage" />}>
             <Route path="/cards" element={<CardsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="recharge.create" />}>
             <Route path="/recharge" element={<RechargePage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="products.manage" />}>
             <Route path="/products" element={<ProductsPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="terminals.manage" />}>
             <Route path="/pdv" element={<PdvPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="fiscal.manage" />}>
             <Route path="/fiscal" element={<FiscalPage />} />
+          </Route>
+          <Route element={<ProtectedRoute permission="integrations.manage" />}>
             <Route path="/integrations" element={<IntegrationsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
