@@ -4,13 +4,28 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Card,
+  Event,
+  PaymentIntent,
   Recharge,
   SaldoReserve,
   Transaction,
 } from '../database/entities';
+import { CashModule } from '../cash/cash.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Card, Recharge, SaldoReserve, Transaction])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Card,
+      Recharge,
+      SaldoReserve,
+      Transaction,
+      PaymentIntent,
+      Event,
+    ]),
+    CashModule,
+    PaymentsModule,
+  ],
   providers: [CardsService],
   controllers: [CardsController],
   exports: [CardsService],

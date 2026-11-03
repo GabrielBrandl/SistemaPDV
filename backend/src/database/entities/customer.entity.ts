@@ -35,6 +35,12 @@ export class Customer {
   @Column({ type: 'varchar', length: 20 })
   telefone: string;
 
+  @Column({ name: 'data_nascimento', type: 'date', nullable: true })
+  dataNascimento: string | null;
+
+  @Column({ name: 'lgpd_consent_at', type: 'timestamptz', nullable: true })
+  lgpdConsentAt: Date | null;
+
   /** ID no Supabase (quando sincronizado) */
   @Column({ name: 'supabase_id', type: 'varchar', nullable: true })
   supabaseId: string | null;

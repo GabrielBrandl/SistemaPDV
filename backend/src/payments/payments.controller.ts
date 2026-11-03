@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { Roles, RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard, RequirePermission } from '../common/guards/permissions.guard';
 import { TenantId } from '../common/decorators/tenant-id.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthUser } from '../common/types/auth-user';
@@ -12,18 +12,18 @@ import {
 } from './dto/payment.dto';
 
 @Controller('payments')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Get('providers')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create', 'integrations.manage')
   providers() {
     return this.paymentsService.providers();
   }
 
   @Post('pix')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create')
   createPix(
     @TenantId() tenantId: string,
     @Body() dto: CreatePixPaymentDto,
@@ -33,7 +33,7 @@ export class PaymentsController {
   }
 
   @Post('card')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create')
   createCard(
     @TenantId() tenantId: string,
     @Body() dto: CreateCardPaymentDto,
@@ -43,13 +43,13 @@ export class PaymentsController {
   }
 
   @Get(':id')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create')
   status(@TenantId() tenantId: string, @Param('id') id: string) {
     return this.paymentsService.getStatus(tenantId, id);
   }
 
   @Post(':id/confirm')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create')
   confirm(
     @TenantId() tenantId: string,
     @Param('id') id: string,
@@ -60,7 +60,7 @@ export class PaymentsController {
   }
 
   @Post(':id/cancel')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('pos.sell', 'recharge.create')
   cancel(@TenantId() tenantId: string, @Param('id') id: string) {
     return this.paymentsService.cancel(tenantId, id);
   }

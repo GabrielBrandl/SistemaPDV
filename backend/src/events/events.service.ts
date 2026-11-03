@@ -5,8 +5,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Card, Event, Order, OrderStatus, Tenant } from '../database/entities';
+import {
+  Card,
+  Event,
+  EventMode,
+  EventStatus,
+  Order,
+  OrderStatus,
+  Tenant,
+} from '../database/entities';
 import { CreateEventDto } from './dto/create-event.dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class EventsService {
@@ -15,6 +24,7 @@ export class EventsService {
     @InjectRepository(Order) private readonly ordersRepo: Repository<Order>,
     @InjectRepository(Card) private readonly cardsRepo: Repository<Card>,
     @InjectRepository(Tenant) private readonly tenantsRepo: Repository<Tenant>,
+    private readonly audit: AuditService,
   ) {}
 
   findAll(tenantId: string) {
@@ -44,9 +54,52 @@ export class EventsService {
       nome: dto.nome,
       dataInicio: new Date(dto.data_inicio),
       dataFim: new Date(dto.data_fim),
-      status: dto.status,
+      status: dto.status ?? EventStatus.DRAFT,
+      modo: dto.modo ?? EventMode.PREPAID,
+      somenteAdultos: dto.somente_adultos ?? false,
+      exigeCaixaAberto: dto.exige_caixa_aberto ?? true,
+      limiteCreditoPostpaid: dto.limite_credito_postpaid ?? null,
     });
-    return this.eventsRepo.save(event);
+    const saved = await this.eventsRepo.save(event);
+    await this.audit.log({
+      tenantId,
+      acao: 'event.create',
+      entidadeTipo: 'event',
+      entidadeId: saved.id,
+      depois: { nome: saved.nome, modo: saved.modo },
+    });
+    return saved;
+  }
+
+  async activate(tenantId: string, id: string, actorUserId?: string) {
+    const event = await this.findOne(tenantId, id);
+    if (event.status === EventStatus.CLOSED) {
+      throw new BadRequestException('Evento encerrado não pode ser reativado');
+    }
+    event.status = EventStatus.ACTIVE;
+    const saved = await this.eventsRepo.save(event);
+    await this.audit.log({
+      tenantId,
+      actorUserId,
+      acao: 'event.activate',
+      entidadeTipo: 'event',
+      entidadeId: id,
+    });
+    return saved;
+  }
+
+  async close(tenantId: string, id: string, actorUserId?: string) {
+    const event = await this.findOne(tenantId, id);
+    event.status = EventStatus.CLOSED;
+    const saved = await this.eventsRepo.save(event);
+    await this.audit.log({
+      tenantId,
+      actorUserId,
+      acao: 'event.close',
+      entidadeTipo: 'event',
+      entidadeId: id,
+    });
+    return saved;
   }
 
   async getDashboard(tenantId: string, id: string) {

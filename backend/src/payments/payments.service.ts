@@ -37,7 +37,9 @@ export class PaymentsService {
   private serialize(intent: PaymentIntent) {
     return {
       id: intent.id,
+      purpose: intent.purpose,
       comanda_id: intent.comandaId,
+      card_id: intent.cardId,
       channel: intent.channel,
       forma: intent.forma,
       valor: Number(intent.valor),
@@ -222,7 +224,10 @@ export class PaymentsService {
       return {
         ...this.serialize(intent),
         mensagem: 'Pagamento já estava aprovado',
-        comanda: await this.comandasService.findOne(tenantId, intent.comandaId),
+        comanda:
+          intent.purpose === 'comanda' && intent.comandaId
+            ? await this.comandasService.findOne(tenantId, intent.comandaId)
+            : null,
       };
     }
 
@@ -247,6 +252,14 @@ export class PaymentsService {
     intent.status = PaymentIntentStatus.APPROVED;
     intent.approvedAt = new Date();
     await this.intentsRepo.save(intent);
+
+    if (intent.purpose === 'recharge' || !intent.comandaId) {
+      return {
+        ...this.serialize(intent),
+        mensagem: 'Pagamento aprovado — confirme a recarga na pulseira',
+        comanda: null,
+      };
+    }
 
     const comanda = await this.comandasService.pay(
       tenantId,

@@ -21,3 +21,6 @@ export * from './customer.entity';
 export * from './payment-intent.entity';
 export * from './subscription-invoice.entity';
 export * from './audit-log.entity';
+export * from './cash-session.entity';
+export * from './cash-movement.entity';
+export * from './refresh-token.entity';

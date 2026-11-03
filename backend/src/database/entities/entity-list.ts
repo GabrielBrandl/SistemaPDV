@@ -21,6 +21,9 @@ import { Customer } from './customer.entity';
 import { PaymentIntent } from './payment-intent.entity';
 import { SubscriptionInvoice } from './subscription-invoice.entity';
 import { AuditLog } from './audit-log.entity';
+import { CashSession } from './cash-session.entity';
+import { CashMovement } from './cash-movement.entity';
+import { RefreshToken } from './refresh-token.entity';
 
 export const entityList = [
   Tenant,
@@ -46,4 +49,7 @@ export const entityList = [
   PaymentIntent,
   SubscriptionInvoice,
   AuditLog,
+  CashSession,
+  CashMovement,
+  RefreshToken,
 ];

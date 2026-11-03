@@ -32,4 +32,16 @@ export class Product {
 
   @Column({ default: true })
   ativo: boolean;
+
+  @Column({ name: 'controla_estoque', type: 'boolean', default: false })
+  controlaEstoque: boolean;
+
+  @Column({ name: 'estoque_atual', type: 'int', default: 0 })
+  estoqueAtual: number;
+
+  @Column({ name: 'estoque_minimo', type: 'int', default: 0 })
+  estoqueMinimo: number;
+
+  @Column({ name: 'somente_adultos', type: 'boolean', default: false })
+  somenteAdultos: boolean;
 }

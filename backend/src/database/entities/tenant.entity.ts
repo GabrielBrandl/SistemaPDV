@@ -92,6 +92,15 @@ export class Tenant {
   @Column({ name: 'trial_ate', type: 'timestamptz', nullable: true })
   trialAte: Date | null;
 
+  @Column({ name: 'logo_url', type: 'varchar', nullable: true })
+  logoUrl: string | null;
+
+  @Column({ name: 'cor_primaria', type: 'varchar', nullable: true })
+  corPrimaria: string | null;
+
+  @Column({ name: 'nome_exibicao', type: 'varchar', nullable: true })
+  nomeExibicao: string | null;
+
   @OneToMany(() => User, (user) => user.tenant)
   users: User[];
 

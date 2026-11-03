@@ -14,6 +14,6 @@ import { SoftPosProvider } from './softpos.provider';
   ],
   providers: [PaymentsService, PixProvider, SoftPosProvider],
   controllers: [PaymentsController],
-  exports: [PaymentsService],
+  exports: [PaymentsService, PixProvider],
 })
 export class PaymentsModule {}

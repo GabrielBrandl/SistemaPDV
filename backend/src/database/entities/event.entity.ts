@@ -16,6 +16,11 @@ export enum EventStatus {
   CLOSED = 'closed',
 }
 
+export enum EventMode {
+  PREPAID = 'prepaid',
+  POSTPAID = 'postpaid',
+}
+
 @Entity('events')
 export class Event {
   @PrimaryGeneratedColumn('uuid')
@@ -39,6 +44,18 @@ export class Event {
 
   @Column({ type: 'varchar', default: EventStatus.DRAFT })
   status: EventStatus;
+
+  @Column({ type: 'varchar', default: EventMode.PREPAID })
+  modo: EventMode;
+
+  @Column({ name: 'somente_adultos', type: 'boolean', default: false })
+  somenteAdultos: boolean;
+
+  @Column({ name: 'exige_caixa_aberto', type: 'boolean', default: true })
+  exigeCaixaAberto: boolean;
+
+  @Column({ name: 'limite_credito_postpaid', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  limiteCreditoPostpaid: number | null;
 
   @OneToMany(() => Card, (card) => card.event)
   cards: Card[];

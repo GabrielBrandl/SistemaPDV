@@ -37,12 +37,19 @@ export class PaymentIntent {
   @JoinColumn({ name: 'tenant_id' })
   tenant: Tenant;
 
-  @Column({ name: 'comanda_id' })
-  comandaId: string;
+  /** comanda | recharge */
+  @Column({ type: 'varchar', default: 'comanda' })
+  purpose: string;
 
-  @ManyToOne(() => Comanda)
+  @Column({ name: 'comanda_id', type: 'varchar', nullable: true })
+  comandaId: string | null;
+
+  @ManyToOne(() => Comanda, { nullable: true })
   @JoinColumn({ name: 'comanda_id' })
-  comanda: Comanda;
+  comanda: Comanda | null;
+
+  @Column({ name: 'card_id', type: 'varchar', nullable: true })
+  cardId: string | null;
 
   @Column({ type: 'varchar' })
   channel: PaymentIntentChannel;

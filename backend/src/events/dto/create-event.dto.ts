@@ -1,5 +1,13 @@
-import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
-import { EventStatus } from '../../database/entities/event.entity';
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { EventMode, EventStatus } from '../../database/entities/event.entity';
 
 export class CreateEventDto {
   @IsString()
@@ -14,4 +22,21 @@ export class CreateEventDto {
   @IsOptional()
   @IsEnum(EventStatus)
   status?: EventStatus;
+
+  @IsOptional()
+  @IsEnum(EventMode)
+  modo?: EventMode;
+
+  @IsOptional()
+  @IsBoolean()
+  somente_adultos?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  exige_caixa_aberto?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  limite_credito_postpaid?: number;
 }

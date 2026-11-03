@@ -27,6 +27,12 @@ export class Recharge {
   @Column({ name: 'forma_pagamento' })
   formaPagamento: string;
 
+  @Column({ type: 'varchar', default: 'completed' })
+  status: string;
+
+  @Column({ name: 'payment_intent_id', type: 'varchar', nullable: true })
+  paymentIntentId: string | null;
+
   @Column({ name: 'operador_id', type: 'varchar', nullable: true })
   operadorId: string | null;
 

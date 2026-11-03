@@ -31,8 +31,26 @@ export class AuditLog {
   @Column()
   acao: string;
 
+  @Column({ name: 'entidade_tipo', type: 'varchar', nullable: true })
+  entidadeTipo: string | null;
+
+  @Column({ name: 'entidade_id', type: 'varchar', nullable: true })
+  entidadeId: string | null;
+
   @Column({ type: 'text', nullable: true })
   detalhe: string | null;
+
+  @Column({ name: 'antes_json', type: 'text', nullable: true })
+  antesJson: string | null;
+
+  @Column({ name: 'depois_json', type: 'text', nullable: true })
+  depoisJson: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  ip: string | null;
+
+  @Column({ name: 'user_agent', type: 'varchar', nullable: true })
+  userAgent: string | null;
 
   @CreateDateColumn({ name: 'criado_em' })
   criadoEm: Date;
