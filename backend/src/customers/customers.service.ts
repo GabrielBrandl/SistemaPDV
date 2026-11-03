@@ -12,6 +12,7 @@ import {
   Comanda,
   ComandaStatus,
   Customer,
+  Event,
 } from '../database/entities';
 import { CardsService } from '../cards/cards.service';
 import { ComandasService } from '../comandas/comandas.service';
@@ -29,10 +30,36 @@ export class CustomersService {
     @InjectRepository(Card) private readonly cardsRepo: Repository<Card>,
     @InjectRepository(Comanda)
     private readonly comandasRepo: Repository<Comanda>,
+    @InjectRepository(Event)
+    private readonly eventsRepo: Repository<Event>,
     private readonly cardsService: CardsService,
     private readonly comandasService: ComandasService,
     private readonly supabase: SupabaseCustomersService,
   ) {}
+
+  private ageFromDob(dob: string): number {
+    const birth = new Date(dob);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const m = now.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age -= 1;
+    return age;
+  }
+
+  private assertAdultIfRequired(
+    event: Event | null,
+    dataNascimento?: string | null,
+  ) {
+    if (!event?.somenteAdultos) return;
+    if (!dataNascimento) {
+      throw new BadRequestException(
+        'Evento 18+ exige data de nascimento',
+      );
+    }
+    if (this.ageFromDob(dataNascimento) < 18) {
+      throw new BadRequestException('Entrada permitida apenas para maiores de 18 anos');
+    }
+  }
 
   private onlyDigits(value: string) {
     return value.replace(/\D/g, '');
@@ -64,6 +91,8 @@ export class CustomersService {
       nome: c.nome,
       cpf: c.cpf,
       telefone: c.telefone,
+      data_nascimento: c.dataNascimento,
+      lgpd_consent_at: c.lgpdConsentAt,
       supabase_id: c.supabaseId,
       ultimo_visita_em: c.ultimoVisitaEm,
       criado_em: c.criadoEm,
@@ -113,6 +142,19 @@ export class CustomersService {
     const telefone = this.normalizePhone(dto.telefone);
     const nome = dto.nome.trim();
 
+    if (dto.lgpd_consent !== true) {
+      throw new BadRequestException(
+        'É necessário consentimento LGPD para cadastrar o cliente',
+      );
+    }
+
+    if (dto.event_id) {
+      const event = await this.eventsRepo.findOne({
+        where: { id: dto.event_id, tenantId },
+      });
+      this.assertAdultIfRequired(event, dto.data_nascimento);
+    }
+
     let customer = await this.customersRepo.findOne({
       where: { tenantId, cpf },
     });
@@ -129,6 +171,8 @@ export class CustomersService {
         nome,
         cpf,
         telefone,
+        dataNascimento: dto.data_nascimento ?? null,
+        lgpdConsentAt: new Date(),
         ultimoVisitaEm: new Date(),
       }),
     );

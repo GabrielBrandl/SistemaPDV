@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { Roles, RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard, RequirePermission } from '../common/guards/permissions.guard';
 import { TenantId } from '../common/decorators/tenant-id.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthUser } from '../common/types/auth-user';
@@ -12,24 +12,24 @@ import {
 } from './dto/customer.dto';
 
 @Controller('customers')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get()
-  @Roles('admin', 'super_admin', 'operator', 'exit')
+  @RequirePermission('customers.manage', 'exit.control')
   list(@TenantId() tenantId: string) {
     return this.customersService.list(tenantId);
   }
 
   @Post('lookup')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('customers.manage', 'recharge.create')
   lookup(@TenantId() tenantId: string, @Body() dto: LookupCpfDto) {
     return this.customersService.lookupByCpf(tenantId, dto.cpf);
   }
 
   @Post('register')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('customers.manage')
   register(
     @TenantId() tenantId: string,
     @Body() dto: RegisterCustomerDto,
@@ -39,7 +39,7 @@ export class CustomersController {
   }
 
   @Post('checkin')
-  @Roles('admin', 'super_admin', 'operator')
+  @RequirePermission('customers.manage')
   checkin(
     @TenantId() tenantId: string,
     @Body() dto: CheckinCustomerDto,

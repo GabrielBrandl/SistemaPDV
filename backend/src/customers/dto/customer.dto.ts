@@ -1,4 +1,6 @@
 import {
+  IsBoolean,
+  IsDateString,
   IsOptional,
   IsString,
   IsUUID,
@@ -31,6 +33,14 @@ export class RegisterCustomerDto {
   @IsOptional()
   @IsUUID()
   event_id?: string;
+
+  @IsOptional()
+  @IsDateString()
+  data_nascimento?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  lgpd_consent?: boolean;
 }
 
 export class CheckinCustomerDto {
