@@ -14,7 +14,7 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         // Produção EasyPanel (maquininha). Emulador local: http://10.0.2.2:3001/api/v1
-        buildConfigField("String", "API_BASE_URL", "\"https://sistema-pdv.9nb5f0.easypanel.host/api/v1\"")
+        buildConfigField("String", "API_BASE_URL", "\"http://sistema-pdv.129-121-39-17.sslip.io/api/v1\"")
         buildConfigField("String", "PAGBANK_ACTIVATION_CODE", "\"\"")
         buildConfigField("String", "CIELO_CLIENT_ID", "\"\"")
         buildConfigField("String", "CIELO_ACCESS_TOKEN", "\"\"")

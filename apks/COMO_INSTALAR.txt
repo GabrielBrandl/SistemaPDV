@@ -1,41 +1,42 @@
 PDV Cashless — Cielo Smart e Mercado Pago Point
 ================================================
 
-APKs prontos nesta pasta:
+URL do sistema (novo EasyPanel):
+  http://sistema-pdv.129-121-39-17.sslip.io/
 
-  PDV-Cielo.apk        → instale NA maquininha Cielo Smart (LIO / DX)
-  PDV-MercadoPago.apk  → instale NA maquininha Mercado Pago Point Smart
+Painel EasyPanel:
+  http://129.121.39.17:3000/
+  Projeto: sistema-pdv  |  Serviço compose: app
 
-Não instale os dois no mesmo terminal. Cada máquina recebe o APK dela.
+APKs:
+
+  PDV-Cielo.apk        → maquininha Cielo Smart (LIO / DX)
+  PDV-MercadoPago.apk  → maquininha Mercado Pago Point Smart
+
+Não instale os dois no mesmo terminal.
 
 
-1. Cielo Smart
---------------
-1. Ligue o Wi-Fi do terminal
-2. Copie PDV-Cielo.apk (USB, e-mail ou adb install PDV-Cielo.apk)
-3. Abra o app "PDV Cielo"
+1. Instalar
+-----------
+1. Wi-Fi no terminal
+2. Copie o APK (USB / adb install)
+3. Abra o app
 4. URL da API:
-   https://sistema-pdv.9nb5f0.easypanel.host/api/v1
-5. Login do operador
-
-Para cobrança real no cartão: Client ID + Access Token no portal Cielo
-(docs/INSTALACAO_MAQUININHA_CIELO.md)
+   http://sistema-pdv.129-121-39-17.sslip.io/api/v1
+5. Login operador:
+   operador@pdv.local / operador123
 
 
-2. Mercado Pago Point
----------------------
-1. Terminal em modo PDV
-2. Instale PDV-MercadoPago.apk
-3. Abra o app "PDV Point"
-4. Mesma URL da API e login do operador
-
-Para cobrança real: Access Token + terminal_id no EasyPanel
-(docs/INSTALACAO_MAQUININHA_MERCADOPAGO.md)
-
-
-3. Uso
+2. Uso
 ------
-Aproxime a pulseira NFC → lance produtos → PAGAR → PIX / Débito / Crédito
+Pulseira NFC → produtos → PAGAR → PIX / Débito / Crédito
 
-Sem as chaves do portal, o PDV abre e a comanda funciona.
-O cartão só autoriza depois da homologação Cielo / Point.
+
+3. Cobrança real
+----------------
+Cielo: Client ID + Access Token no portal + env do EasyPanel
+Mercado Pago: Access Token + terminal_id no EasyPanel (Environment do serviço app)
+
+Guias:
+  docs/INSTALACAO_MAQUININHA_CIELO.md
+  docs/INSTALACAO_MAQUININHA_MERCADOPAGO.md
