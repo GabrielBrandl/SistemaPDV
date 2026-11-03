@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   Comanda,
@@ -19,7 +19,7 @@ import { IntegrationsModule } from '../integrations/integrations.module';
       ComandaPayment,
       Product,
     ]),
-    CardsModule,
+    forwardRef(() => CardsModule),
     IntegrationsModule,
   ],
   providers: [ComandasService],

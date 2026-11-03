@@ -11,7 +11,7 @@ import {
   Transaction,
 } from '../database/entities';
 import { CashModule } from '../cash/cash.module';
-import { PaymentsModule } from '../payments/payments.module';
+import { PixModule } from '../payments/pix.module';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { PaymentsModule } from '../payments/payments.module';
       Event,
     ]),
     CashModule,
-    PaymentsModule,
+    PixModule,
   ],
   providers: [CardsService],
   controllers: [CardsController],

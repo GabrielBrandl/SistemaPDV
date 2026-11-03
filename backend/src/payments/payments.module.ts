@@ -1,19 +1,20 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comanda, PaymentIntent } from '../database/entities';
 import { ComandasModule } from '../comandas/comandas.module';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
-import { PixProvider } from './pix.provider';
 import { SoftPosProvider } from './softpos.provider';
+import { PixModule } from './pix.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PaymentIntent, Comanda]),
-    ComandasModule,
+    forwardRef(() => ComandasModule),
+    PixModule,
   ],
-  providers: [PaymentsService, PixProvider, SoftPosProvider],
+  providers: [PaymentsService, SoftPosProvider],
   controllers: [PaymentsController],
-  exports: [PaymentsService, PixProvider],
+  exports: [PaymentsService, PixModule],
 })
 export class PaymentsModule {}
