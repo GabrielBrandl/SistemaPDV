@@ -25,6 +25,7 @@ import { PlansModule } from './plans/plans.module';
 import { AuditModule } from './audit/audit.module';
 import { CashModule } from './cash/cash.module';
 import { KdsModule } from './kds/kds.module';
+import { LeadsModule } from './leads/leads.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -103,6 +104,7 @@ import { HealthController } from './health.controller';
     FiscalModule,
     ReportsModule,
     KdsModule,
+    LeadsModule,
   ],
   controllers: [HealthController],
 })

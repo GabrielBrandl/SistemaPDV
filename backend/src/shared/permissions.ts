@@ -112,7 +112,7 @@ export function homePathForRole(role: string | null | undefined): string {
       return '/platform';
     case 'tenant_admin':
     case 'supervisor':
-      return '/';
+      return '/app';
     case 'cashier':
       return '/t/recarga';
     case 'bartender':

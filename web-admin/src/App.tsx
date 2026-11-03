@@ -27,6 +27,8 @@ import { ExitGatePage } from './pages/ExitGatePage';
 import { AdminControlPage } from './pages/AdminControlPage';
 import { CadastroPage } from './pages/CadastroPage';
 import { PhonePayPage } from './pages/PhonePayPage';
+import { LandingPage } from './pages/LandingPage';
+import { LeadsPage } from './pages/LeadsPage';
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboard" element={<OnboardPage />} />
           <Route
@@ -71,7 +74,7 @@ export function App() {
 
           {/* Painel administrativo */}
           <Route element={<ProtectedRoute permission="reports.view" />}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/app" element={<DashboardPage />} />
             <Route path="/reports" element={<ReportsPage />} />
           </Route>
           <Route element={<ProtectedRoute permission="tenant.manage" />}>
@@ -87,6 +90,7 @@ export function App() {
               path="/platform/empresas/:id"
               element={<CompanyDetailPage />}
             />
+            <Route path="/platform/leads" element={<LeadsPage />} />
             <Route path="/tenants" element={<TenantsPage />} />
           </Route>
           <Route element={<ProtectedRoute permission="team.manage" />}>

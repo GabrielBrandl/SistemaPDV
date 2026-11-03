@@ -113,7 +113,7 @@ export function homePathForRole(role: string | null | undefined): string {
       return '/platform';
     case 'tenant_admin':
     case 'supervisor':
-      return '/';
+      return '/app';
     case 'cashier':
       return '/t/recarga';
     case 'bartender':
@@ -127,6 +127,7 @@ export function homePathForRole(role: string | null | undefined): string {
 
 export const NAV_BY_PERMISSION: { to: string; label: string; permission: Permission }[] = [
   { to: '/platform', label: 'Plataforma', permission: 'platform.manage' },
+  { to: '/platform/leads', label: 'Leads', permission: 'platform.manage' },
   { to: '/tenants', label: 'Empresas', permission: 'platform.manage' },
   { to: '/precos', label: 'Planos', permission: 'platform.manage' },
   { to: '/equipe', label: 'Equipe', permission: 'team.manage' },

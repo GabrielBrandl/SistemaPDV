@@ -24,3 +24,4 @@ export * from './audit-log.entity';
 export * from './cash-session.entity';
 export * from './cash-movement.entity';
 export * from './refresh-token.entity';
+export * from './lead.entity';

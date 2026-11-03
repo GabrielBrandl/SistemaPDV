@@ -24,6 +24,7 @@ import { AuditLog } from './audit-log.entity';
 import { CashSession } from './cash-session.entity';
 import { CashMovement } from './cash-movement.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { Lead } from './lead.entity';
 
 export const entityList = [
   Tenant,
@@ -52,4 +53,5 @@ export const entityList = [
   CashSession,
   CashMovement,
   RefreshToken,
+  Lead,
 ];
