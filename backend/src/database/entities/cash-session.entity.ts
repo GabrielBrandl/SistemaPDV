@@ -11,7 +11,7 @@ import { Tenant } from './tenant.entity';
 import { Event } from './event.entity';
 import { User } from './user.entity';
 import { PdvTerminal } from './pdv-terminal.entity';
-import { CashMovement } from './cash-movement.entity';
+import type { CashMovement } from './cash-movement.entity';
 
 export enum CashSessionStatus {
   OPEN = 'open',
@@ -75,7 +75,7 @@ export class CashSession {
   @Column({ type: 'timestamptz', nullable: true })
   fechamento: Date | null;
 
-  @OneToMany(() => CashMovement, (m) => m.cashSession)
+  @OneToMany('CashMovement', 'cashSession')
   movements: CashMovement[];
 
   @CreateDateColumn({ name: 'criado_em' })
