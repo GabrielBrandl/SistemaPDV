@@ -7,9 +7,17 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { AuthUser } from '../types/auth-user';
+import { normalizeRole } from '../../shared/permissions';
 
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+
+function roleMatches(userRole: string, required: string): boolean {
+  if (userRole === required) return true;
+  const u = normalizeRole(userRole);
+  const r = normalizeRole(required);
+  return !!u && !!r && u === r;
+}
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -24,8 +32,11 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<{ user: AuthUser }>();
     const user = request.user;
-    if (!user || !roles.includes(user.role)) {
-      throw new ForbiddenException('Sem permissão para esta ação');
+    if (!user?.role || !roles.some((r) => roleMatches(user.role, r))) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Sem permissão para esta ação',
+      });
     }
     return true;
   }

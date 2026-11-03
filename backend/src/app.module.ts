@@ -22,6 +22,9 @@ import { PaymentsModule } from './payments/payments.module';
 import { PlatformModule } from './platform/platform.module';
 import { UsersModule } from './users/users.module';
 import { PlansModule } from './plans/plans.module';
+import { AuditModule } from './audit/audit.module';
+import { CashModule } from './cash/cash.module';
+import { KdsModule } from './kds/kds.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -34,6 +37,8 @@ import { HealthController } from './health.controller';
         const dbUrl = config.get<string>('DATABASE_URL');
         const dbType = config.get<string>('DB_TYPE', dbUrl ? 'postgres' : 'sqlite');
         const dbHost = config.get<string>('DB_HOST');
+        const sync =
+          (config.get<string>('TYPEORM_SYNC') || 'true').toLowerCase() !== 'false';
 
         if (dbType === 'postgres') {
           const sslEnabled = ['true', '1', 'require'].includes(
@@ -42,7 +47,7 @@ import { HealthController } from './health.controller';
           const base = {
             type: 'postgres' as const,
             entities: entityList,
-            synchronize: true,
+            synchronize: sync,
             logging: config.get<string>('DB_LOGGING') === 'true',
             ssl: sslEnabled ? { rejectUnauthorized: false } : false,
             extra: {
@@ -70,12 +75,14 @@ import { HealthController } from './health.controller';
           type: 'sqlite' as const,
           database: config.get<string>('SQLITE_PATH', 'pdv.sqlite'),
           entities: entityList,
-          synchronize: true,
+          synchronize: sync,
           logging: false,
         };
       },
     }),
     DatabaseModule,
+    AuditModule,
+    CashModule,
     AuthModule,
     TenantsModule,
     PlansModule,
@@ -95,6 +102,7 @@ import { HealthController } from './health.controller';
     SyncModule,
     FiscalModule,
     ReportsModule,
+    KdsModule,
   ],
   controllers: [HealthController],
 })

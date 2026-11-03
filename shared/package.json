@@ -1,0 +1,11 @@
+{
+  "name": "@pdv/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./permissions.ts",
+  "exports": {
+    "./permissions": "./permissions.ts",
+    "./format": "./format.ts"
+  }
+}
