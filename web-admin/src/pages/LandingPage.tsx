@@ -9,24 +9,24 @@ import type { PlanDefinition } from '../types/saas';
 const STEPS = [
   {
     n: '01',
-    title: 'Cadastro e pulseira',
-    text: 'Cliente chega, faz check-in e vincula a pulseira NFC. Em segundos já está liberado para consumir.',
+    title: 'Pulseira na entrada',
+    text: 'Check-in rápido e vínculo NFC. O cliente já entra com saldo ou abre o consumo no modo do evento.',
     img: '/marketing/dashboard.png',
-    alt: 'Dashboard operacional do PDV Cashless',
+    alt: 'Dashboard do evento no PDV Cashless',
   },
   {
     n: '02',
-    title: 'Recarga na hora',
-    text: 'PIX, cartão ou dinheiro com caixa aberto. O saldo cai na pulseira só depois do pagamento confirmado.',
+    title: 'Recarga sem fila',
+    text: 'PIX, cartão ou dinheiro. O crédito só cai depois do pagamento aprovado — com caixa e auditoria.',
     img: '/marketing/recarga.png',
-    alt: 'Tela de recarga com valores e PIX',
+    alt: 'Tela de recarga de pulseira',
   },
   {
     n: '03',
-    title: 'Venda no terminal',
-    text: 'Operador aproxima a pulseira na Cielo, Mercado Pago ou PagBank, escolhe o item e confirma. Sem fila de caixa.',
+    title: 'Venda na maquininha',
+    text: 'Aproxima a pulseira, escolhe o item, confirma. Cielo, Mercado Pago ou PagBank no mesmo fluxo.',
     img: '/marketing/pos.png',
-    alt: 'Tela do PDV terminal com pulseira NFC',
+    alt: 'PDV terminal com pulseira NFC',
   },
 ];
 
@@ -45,7 +45,6 @@ export function LandingPage() {
 
   return (
     <div className="lp">
-      <Nav />
       <Hero />
       <ProductStrip />
       <HowItWorks />
@@ -56,49 +55,49 @@ export function LandingPage() {
   );
 }
 
-function Nav() {
-  return (
-    <header className="lp-nav">
-      <a href="#topo" className="lp-logo">
-        PDV Cashless
-      </a>
-      <nav className="lp-nav-links" aria-label="Seções">
-        <a href="#produto">Produto</a>
-        <a href="#como">Como funciona</a>
-        <a href="#precos">Preços</a>
-        <a href="#contato">Demo</a>
-        <Link to="/login" className="lp-nav-cta">
-          Entrar
-        </Link>
-      </nav>
-    </header>
-  );
-}
-
 function Hero() {
   return (
     <section id="topo" className="lp-hero">
-      <div className="lp-hero-bg" aria-hidden />
-      <div className="lp-hero-inner">
-        <p className="lp-logo lp-hero-brand">PDV Cashless</p>
-        <h1>Cashless que sua equipe usa na maquininha.</h1>
-        <p className="lp-hero-sub">
-          Pulseira NFC, recarga segura e PDV nas Cielo, Mercado Pago e PagBank —
-          do bar ao festival.
-        </p>
-        <div className="lp-actions">
-          <a href="#contato" className="lp-btn lp-btn-main">
-            Pedir demonstração
-          </a>
-          <a href="#precos" className="lp-btn lp-btn-soft">
-            Ver preços
-          </a>
+      <div
+        className="lp-hero-atmosphere"
+        style={{ backgroundImage: "url('/marketing/atmosphere.jpg')" }}
+        aria-hidden
+      />
+      <div className="lp-hero-veil" aria-hidden />
+
+      <div className="lp-hero-top">
+        <p className="lp-wordmark">PDV Cashless</p>
+        <div className="lp-hero-top-actions">
+          <a href="#precos">Preços</a>
+          <Link to="/login">Entrar</Link>
         </div>
       </div>
-      <div className="lp-hero-shot">
-        <ScreenFrame label="PDV Terminal · Pulseira NFC">
-          <img src="/marketing/pos.png" alt="Tela do PDV Cashless no terminal" />
-        </ScreenFrame>
+
+      <div className="lp-hero-stage">
+        <div className="lp-hero-copy">
+          <h1>O bar vende. A pulseira paga.</h1>
+          <p className="lp-hero-sub">
+            Cashless para bares e eventos: NFC, recarga e PDV nas maquininhas —
+            sem fricção no pico.
+          </p>
+          <div className="lp-actions">
+            <a href="#contato" className="lp-btn lp-btn-amber">
+              Pedir demonstração
+            </a>
+            <a href="#como" className="lp-btn lp-btn-ghost">
+              Ver como funciona
+            </a>
+          </div>
+        </div>
+
+        <div className="lp-hero-device">
+          <ScreenFrame glow>
+            <img
+              src="/marketing/pos.png"
+              alt="PDV Cashless no terminal com pulseira NFC"
+            />
+          </ScreenFrame>
+        </div>
       </div>
     </section>
   );
@@ -106,43 +105,52 @@ function Hero() {
 
 function ScreenFrame({
   children,
-  label,
+  glow = false,
+  caption,
 }: {
   children: ReactNode;
-  label?: string;
+  glow?: boolean;
+  caption?: string;
 }) {
   return (
-    <figure className="lp-frame">
-      {label && <figcaption>{label}</figcaption>}
-      <div className="lp-frame-screen">{children}</div>
+    <figure className={`lp-device ${glow ? 'is-glow' : ''}`}>
+      {caption ? <figcaption>{caption}</figcaption> : null}
+      <div className="lp-device-bezel">{children}</div>
     </figure>
   );
 }
 
 function ProductStrip() {
   return (
-    <section id="produto" className="lp-section">
-      <div className="lp-section-head">
-        <p className="lp-kicker">Produto</p>
-        <h2>Tudo que a operação precisa, em uma tela.</h2>
-        <p className="lp-muted">
-          Dashboard, terminal de venda e acesso do time — prints reais do
-          sistema.
+    <section id="produto" className="lp-band">
+      <div className="lp-band-inner">
+        <p className="lp-eyebrow">Nas telas</p>
+        <h2>Feito para a operação real.</h2>
+        <p className="lp-lede">
+          Prints do sistema em produção — dashboard, recarga e PDV na
+          maquininha.
         </p>
-      </div>
-      <div className="lp-gallery">
-        <ScreenFrame label="Dashboard do evento">
-          <img
-            src="/marketing/dashboard.png"
-            alt="Dashboard com vendas, cartões e saldo"
-          />
-        </ScreenFrame>
-        <ScreenFrame label="PDV na maquininha">
-          <img src="/marketing/pos.png" alt="PDV terminal aguardando pulseira" />
-        </ScreenFrame>
-        <ScreenFrame label="Recarga da pulseira">
-          <img src="/marketing/recarga.png" alt="Totem de recarga com PIX" />
-        </ScreenFrame>
+
+        <div className="lp-shot-rail">
+          <ScreenFrame caption="Dashboard">
+            <img
+              src="/marketing/dashboard.png"
+              alt="Dashboard com vendas e saldo circulando"
+            />
+          </ScreenFrame>
+          <ScreenFrame caption="Recarga">
+            <img
+              src="/marketing/recarga.png"
+              alt="Recarga com valores rápidos e PIX"
+            />
+          </ScreenFrame>
+          <ScreenFrame caption="PDV Terminal">
+            <img
+              src="/marketing/pos.png"
+              alt="Terminal aguardando pulseira NFC"
+            />
+          </ScreenFrame>
+        </div>
       </div>
     </section>
   );
@@ -150,30 +158,35 @@ function ProductStrip() {
 
 function HowItWorks() {
   return (
-    <section id="como" className="lp-section lp-section-tint">
-      <div className="lp-section-head">
-        <p className="lp-kicker">Como funciona</p>
-        <h2>Três passos. Zero fricção no pico.</h2>
+    <section id="como" className="lp-band lp-band-deep">
+      <div className="lp-band-inner">
+        <p className="lp-eyebrow">Fluxo</p>
+        <h2>Como funciona</h2>
+        <p className="lp-lede">
+          Da porta ao copo, em três momentos. Seu time não inventa processo no
+          meio do show.
+        </p>
+
+        <div className="lp-flow">
+          {STEPS.map((step, i) => (
+            <article key={step.n} className="lp-flow-item">
+              <ScreenFrame>
+                <img src={step.img} alt={step.alt} />
+              </ScreenFrame>
+              <div className="lp-flow-copy">
+                <span>{step.n}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+                {i === 2 && (
+                  <p className="lp-terminals">
+                    Cielo Smart · Mercado Pago Point · PagBank
+                  </p>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
-      <div className="lp-steps">
-        {STEPS.map((s) => (
-          <article key={s.n} className="lp-step">
-            <ScreenFrame>
-              <img src={s.img} alt={s.alt} />
-            </ScreenFrame>
-            <div className="lp-step-copy">
-              <span className="lp-step-n">{s.n}</span>
-              <h3>{s.title}</h3>
-              <p>{s.text}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-      <ul className="lp-chips" aria-label="Terminais compatíveis">
-        <li>Cielo Smart</li>
-        <li>Mercado Pago Point</li>
-        <li>PagBank SmartPOS</li>
-      </ul>
     </section>
   );
 }
@@ -183,66 +196,56 @@ function Pricing() {
     queryKey: ['plans-landing'],
     queryFn: async () => (await api.get('/plans')).data as PlanDefinition[],
   });
-
   const list = (plans || []).filter((p) => p.id !== 'free');
 
   return (
-    <section id="precos" className="lp-section">
-      <div className="lp-section-head">
-        <p className="lp-kicker">Preços</p>
-        <h2>Planos claros, trial incluso.</h2>
-        <p className="lp-muted">
-          Escolha pelo tamanho da operação. Sem taxa escondida na vitrine.
+    <section id="precos" className="lp-band">
+      <div className="lp-band-inner">
+        <p className="lp-eyebrow">Planos</p>
+        <h2>Preço transparente.</h2>
+        <p className="lp-lede">
+          Trial incluso. Escala por terminais, eventos e usuários.
         </p>
-      </div>
 
-      {isLoading ? (
-        <p className="lp-muted">Carregando planos…</p>
-      ) : (
-        <div className="lp-pricing">
-          {list.map((p) => (
-            <article
-              key={p.id}
-              className={`lp-plan ${p.destaque ? 'is-featured' : ''}`}
-            >
-              {p.destaque && <span className="lp-plan-badge">Mais escolhido</span>}
-              <h3>{p.nome}</h3>
-              <p className="lp-plan-desc">{p.descricao}</p>
-              <p className="lp-plan-price">
-                {formatBRL(p.preco_mensal)}
-                <span>/mês</span>
-              </p>
-              <p className="lp-plan-meta">
-                ou {formatBRL(p.preco_anual)}/ano · {p.trial_dias} dias de trial
-              </p>
-              <ul>
-                <li>
-                  Até {p.limites.max_terminais} terminais
-                </li>
-                <li>Até {p.limites.max_eventos} eventos</li>
-                <li>Até {p.limites.max_usuarios} usuários</li>
-                {p.recursos.slice(0, 4).map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
-              <a
-                href={`#contato`}
-                className={`lp-btn ${p.destaque ? 'lp-btn-main' : 'lp-btn-soft'}`}
-                onClick={() => {
-                  sessionStorage.setItem('lp_plan', p.id);
-                }}
+        {isLoading ? (
+          <p className="lp-lede">Carregando…</p>
+        ) : (
+          <div className="lp-price-grid">
+            {list.map((p) => (
+              <article
+                key={p.id}
+                className={`lp-price-card ${p.destaque ? 'is-hot' : ''}`}
               >
-                Quero o {p.nome}
-              </a>
-            </article>
-          ))}
-        </div>
-      )}
-      <p className="lp-pricing-note">
-        Já decidiu?{' '}
-        <Link to="/onboard">Criar conta</Link> ou{' '}
-        <Link to="/precos">ver comparação completa</Link>.
-      </p>
+                {p.destaque ? <span className="lp-hot">Recomendado</span> : null}
+                <h3>{p.nome}</h3>
+                <p className="lp-price-desc">{p.descricao}</p>
+                <p className="lp-price-value">
+                  {formatBRL(p.preco_mensal)}
+                  <small>/mês</small>
+                </p>
+                <p className="lp-price-year">
+                  {formatBRL(p.preco_anual)} no anual · {p.trial_dias} dias trial
+                </p>
+                <ul>
+                  <li>{p.limites.max_terminais} terminais</li>
+                  <li>{p.limites.max_eventos} eventos</li>
+                  <li>{p.limites.max_usuarios} usuários</li>
+                  {p.recursos.slice(0, 3).map((r) => (
+                    <li key={r}>{r}</li>
+                  ))}
+                </ul>
+                <a
+                  href="#contato"
+                  className={`lp-btn ${p.destaque ? 'lp-btn-amber' : 'lp-btn-ghost'}`}
+                  onClick={() => sessionStorage.setItem('lp_plan', p.nome)}
+                >
+                  Quero o {p.nome}
+                </a>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -260,9 +263,7 @@ function LeadSection() {
 
   useEffect(() => {
     const plan = sessionStorage.getItem('lp_plan');
-    if (plan) {
-      setMensagem((m) => m || `Interesse no plano ${plan}.`);
-    }
+    if (plan) setMensagem((m) => m || `Quero o plano ${plan}.`);
   }, []);
 
   async function onSubmit(e: FormEvent) {
@@ -289,21 +290,21 @@ function LeadSection() {
   }
 
   return (
-    <section id="contato" className="lp-section lp-section-tint">
-      <div className="lp-contact">
+    <section id="contato" className="lp-band lp-band-deep">
+      <div className="lp-band-inner lp-contact">
         <div>
-          <p className="lp-kicker">Demonstração</p>
-          <h2>Veja rodando no seu cenário.</h2>
-          <p className="lp-muted">
-            Conta quantas maquininhas e se é bar fixo ou evento. Retornamos com
-            demo e proposta.
+          <p className="lp-eyebrow">Demo</p>
+          <h2>Vamos rodar no seu cenário.</h2>
+          <p className="lp-lede">
+            Quantas maquininhas? Bar fixo ou festival? Respondemos com demo e
+            proposta.
           </p>
         </div>
 
         {done ? (
-          <div className="lp-form lp-form-ok" role="status">
-            <h3>Pedido recebido</h3>
-            <p>Em breve falamos no WhatsApp ou e-mail que você passou.</p>
+          <div className="lp-form is-ok" role="status">
+            <h3>Recebido.</h3>
+            <p>Em breve falamos no WhatsApp ou e-mail.</p>
           </div>
         ) : (
           <form className="lp-form" onSubmit={onSubmit}>
@@ -334,7 +335,6 @@ function LeadSection() {
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
                 autoComplete="tel"
-                placeholder="11 99999-9999"
               />
             </label>
             <label>
@@ -357,22 +357,21 @@ function LeadSection() {
                 <option value="outro">Outro</option>
               </select>
             </label>
-            <label className="lp-span-2">
+            <label className="lp-span">
               Detalhes
               <textarea
                 rows={3}
                 value={mensagem}
                 onChange={(e) => setMensagem(e.target.value)}
-                placeholder="Ex.: 8 maquininhas PagBank, festa no mês que vem…"
               />
             </label>
-            {error && <p className="lp-error lp-span-2">{error}</p>}
+            {error ? <p className="lp-error lp-span">{error}</p> : null}
             <button
               type="submit"
-              className="lp-btn lp-btn-main lp-span-2"
+              className="lp-btn lp-btn-amber lp-span"
               disabled={loading}
             >
-              {loading ? 'Enviando…' : 'Quero uma demo'}
+              {loading ? 'Enviando…' : 'Pedir demonstração'}
             </button>
           </form>
         )}
@@ -383,11 +382,11 @@ function LeadSection() {
 
 function Footer() {
   return (
-    <footer className="lp-footer">
-      <span className="lp-logo">PDV Cashless</span>
+    <footer className="lp-foot">
+      <p className="lp-wordmark">PDV Cashless</p>
       <div>
         <Link to="/login">Entrar</Link>
-        <Link to="/precos">Planos</Link>
+        <Link to="/onboard">Criar conta</Link>
         <a href="mailto:contato@pyrou.com.br">contato@pyrou.com.br</a>
       </div>
     </footer>
