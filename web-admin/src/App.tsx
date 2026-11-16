@@ -29,6 +29,7 @@ import { CadastroPage } from './pages/CadastroPage';
 import { PhonePayPage } from './pages/PhonePayPage';
 import { LandingPage } from './pages/LandingPage';
 import { LeadsPage } from './pages/LeadsPage';
+import { PrivacidadePage, TermosPage } from './pages/LegalPages';
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,8 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/termos" element={<TermosPage />} />
+          <Route path="/privacidade" element={<PrivacidadePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/onboard" element={<OnboardPage />} />
           <Route

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /termos
+Allow: /privacidade
+Allow: /precos
+
+Disallow: /app
+Disallow: /login
+Disallow: /onboard
+Disallow: /platform
+Disallow: /admin
+Disallow: /t/
+
+Sitemap: https://sistema-pdv.129-121-39-17.sslip.io/sitemap.xml
