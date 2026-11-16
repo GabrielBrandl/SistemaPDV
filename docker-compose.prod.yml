@@ -55,7 +55,7 @@ services:
       #   CIELO_ACCESS_TOKEN=...
       # APK flavor cielo must be built with the SAME CIELO_* pair.
       # Missing CIELO_* does NOT block card sessions when mode=cielo (on-device APK holds creds).
-      SOFTPOS_PROVIDER: ${SOFTPOS_PROVIDER:-demo}
+      SOFTPOS_PROVIDER: ${SOFTPOS_PROVIDER:-cielo}
       CIELO_CLIENT_ID: ${CIELO_CLIENT_ID:-}
       CIELO_ACCESS_TOKEN: ${CIELO_ACCESS_TOKEN:-}
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
