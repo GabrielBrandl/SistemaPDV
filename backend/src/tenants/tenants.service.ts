@@ -170,13 +170,27 @@ export class TenantsService {
     return this.tenantsRepo.save(tenant);
   }
 
+  private sanitizeTenant(tenant: Tenant) {
+    const { focusNfeToken, ...rest } = tenant;
+    return {
+      ...rest,
+      focusNfeToken: undefined,
+      focus_nfe_token_configured: Boolean(focusNfeToken?.trim()),
+      focus_nfe_token_masked: focusNfeToken?.trim()
+        ? focusNfeToken.trim().length <= 8
+          ? '****'
+          : `${focusNfeToken.trim().slice(0, 4)}…${focusNfeToken.trim().slice(-4)}`
+        : null,
+    };
+  }
+
   async getStats(id: string) {
     const tenant = await this.findOne(id);
     const users = await this.usersRepo.count({
       where: { tenantId: id, ativo: true },
     });
     return {
-      tenant,
+      tenant: this.sanitizeTenant(tenant),
       usuarios: users,
       plan_def: getPlanDefinition(tenant.plano),
     };

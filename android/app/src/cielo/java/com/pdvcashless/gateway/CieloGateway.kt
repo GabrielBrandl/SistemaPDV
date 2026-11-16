@@ -21,16 +21,22 @@ class CieloGateway : PaymentGateway {
     @Volatile
     private var pending: Continuation<PaymentResult>? = null
 
+    /** Token só no APK (BuildConfig) — backend não envia accessToken na API. */
+    private fun resolveClientId(): String =
+        SoftPosSession.cieloClientId?.takeIf { it.isNotBlank() }
+            ?: BuildConfig.CIELO_CLIENT_ID
+
+    private fun resolveAccessToken(): String = BuildConfig.CIELO_ACCESS_TOKEN
+
     override suspend fun activate(activationCode: String): PaymentResult {
-        val ok = BuildConfig.CIELO_CLIENT_ID.isNotBlank() &&
-            BuildConfig.CIELO_ACCESS_TOKEN.isNotBlank()
+        val ok = resolveClientId().isNotBlank() && resolveAccessToken().isNotBlank()
         return PaymentResult(
             success = ok,
             transactionId = null,
             message = if (ok) {
                 "Cielo Smart pronta (Client ID configurado)"
             } else {
-                "Defina CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no flavor cielo"
+                "Defina CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no flavor cielo (ou no backend)"
             },
         )
     }
@@ -43,13 +49,13 @@ class CieloGateway : PaymentGateway {
         val activity = TerminalActivityHolder.current
             ?: return PaymentResult(false, null, "Activity Cielo não disponível")
 
-        val clientId = BuildConfig.CIELO_CLIENT_ID
-        val accessToken = BuildConfig.CIELO_ACCESS_TOKEN
+        val clientId = resolveClientId()
+        val accessToken = resolveAccessToken()
         if (clientId.isBlank() || accessToken.isBlank()) {
             return PaymentResult(
                 false,
                 null,
-                "Configure CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no flavor cielo",
+                "Configure CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no APK flavor cielo (mesmo par do backend)",
             )
         }
 

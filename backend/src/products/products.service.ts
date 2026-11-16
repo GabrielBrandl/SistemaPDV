@@ -35,6 +35,7 @@ export class ProductsService {
       nome: dto.nome,
       preco: dto.preco,
       categoria: dto.categoria ?? null,
+      printStation: dto.print_station ?? null,
       ativo: dto.ativo ?? true,
       controlaEstoque: dto.controla_estoque ?? false,
       estoqueAtual: dto.estoque_atual ?? 0,
@@ -50,6 +51,10 @@ export class ProductsService {
       nome: dto.nome ?? product.nome,
       preco: dto.preco ?? product.preco,
       categoria: dto.categoria ?? product.categoria,
+      printStation:
+        dto.print_station !== undefined
+          ? dto.print_station
+          : product.printStation,
       ativo: dto.ativo ?? product.ativo,
       controlaEstoque: dto.controla_estoque ?? product.controlaEstoque,
       estoqueAtual: dto.estoque_atual ?? product.estoqueAtual,

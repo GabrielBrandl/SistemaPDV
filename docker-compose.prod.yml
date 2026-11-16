@@ -49,6 +49,12 @@ services:
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
       SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-}
       PIX_PROVIDER: ${PIX_PROVIDER:-demo}
+      # SoftPOS: default demo (safe). Live Cielo LIO:
+      #   SOFTPOS_PROVIDER=cielo
+      #   CIELO_CLIENT_ID=...
+      #   CIELO_ACCESS_TOKEN=...
+      # APK flavor cielo must be built with the SAME CIELO_* pair.
+      # Missing CIELO_* does NOT block card sessions when mode=cielo (on-device APK holds creds).
       SOFTPOS_PROVIDER: ${SOFTPOS_PROVIDER:-demo}
       CIELO_CLIENT_ID: ${CIELO_CLIENT_ID:-}
       CIELO_ACCESS_TOKEN: ${CIELO_ACCESS_TOKEN:-}

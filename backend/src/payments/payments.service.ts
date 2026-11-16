@@ -249,6 +249,17 @@ export class PaymentsService {
       intent.providerRef = dto.softpos_transaction_id;
     }
 
+    if (
+      intent.channel === PaymentIntentChannel.CARD_CONTACTLESS &&
+      intent.provider !== 'demo' &&
+      !dto.softpos_transaction_id &&
+      !dto.provider_ref
+    ) {
+      throw new BadRequestException(
+        'Confirmação SoftPOS exige softpos_transaction_id (retorno da maquininha)',
+      );
+    }
+
     intent.status = PaymentIntentStatus.APPROVED;
     intent.approvedAt = new Date();
     await this.intentsRepo.save(intent);
@@ -312,7 +323,11 @@ export class PaymentsService {
           integration: 'deep_link',
           docs: 'https://docs.cielo.com.br/cielo-smart/docs/integracao-via-deep-link',
           flavor: 'cielo',
+          /** SOFTPOS_PROVIDER=cielo — sessões NÃO dependem de CIELO_* no backend. */
           ready: this.softpos.cieloReady,
+          credentials_on_backend: this.softpos.cieloCredentialsConfigured,
+          note:
+            'Pagamento on-device (LIO): compile o APK flavor cielo com o mesmo CIELO_CLIENT_ID/ACCESS_TOKEN. CIELO_* no backend preenche softpos_request.cielo e é opcional.',
         },
         mercadopago: {
           name: 'Mercado Pago Point',

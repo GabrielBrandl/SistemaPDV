@@ -14,6 +14,10 @@ export type SoftPosMode =
  * PagBank: PlugPag nativo.
  * Cielo Smart: Deep Link lio://payment (sem SDK legado).
  * Mercado Pago Point: order API (/v1/orders type=point) + app no terminal.
+ *
+ * Cielo on-device (LIO): o APK flavor `cielo` carrega CIELO_CLIENT_ID/ACCESS_TOKEN
+ * no BuildConfig. Credenciais no backend são opcionais — preenchem softpos_request
+ * para o app preferir o mesmo par — e NÃO bloqueiam createSession.
  */
 @Injectable()
 export class SoftPosProvider {
@@ -23,11 +27,20 @@ export class SoftPosProvider {
     return this.resolve(this.config.get<string>('SOFTPOS_PROVIDER'));
   }
 
-  get cieloReady() {
+  /** Backend tem CIELO_* — útil para montar softpos_request.cielo completo. */
+  get cieloCredentialsConfigured() {
     return !!(
-      this.config.get<string>('CIELO_CLIENT_ID') &&
-      this.config.get<string>('CIELO_ACCESS_TOKEN')
+      this.config.get<string>('CIELO_CLIENT_ID')?.trim() &&
+      this.config.get<string>('CIELO_ACCESS_TOKEN')?.trim()
     );
+  }
+
+  /**
+   * Terminal Cielo está habilitado pelo modo SoftPOS.
+   * Não exige CIELO_* no backend: pagamentos on-device usam o APK.
+   */
+  get cieloReady() {
+    return this.mode === 'cielo';
   }
 
   get mercadoPagoReady() {
@@ -195,7 +208,9 @@ export class SoftPosProvider {
       case 'pagbank':
         return 'PagBank SmartPOS: o app abre o PlugPag no terminal. Aproxime, insira ou pague PIX na Moderninha.';
       case 'cielo':
-        return 'Cielo Smart: o app abre o pagamento via Deep Link (lio://). Confirme débito/crédito/PIX na LIO.';
+        return this.cieloCredentialsConfigured
+          ? 'Cielo Smart: o app abre o pagamento via Deep Link (lio://). Confirme débito/crédito/PIX na LIO.'
+          : 'Cielo Smart: use o APK flavor cielo com CIELO_CLIENT_ID/ACCESS_TOKEN. Backend sem CIELO_* — sessão liberada para pagamento on-device.';
       case 'mercadopago':
         return 'Mercado Pago Point: a cobrança aparece no terminal. O cliente aproxima o cartão ou paga PIX.';
       case 'demo':
@@ -205,6 +220,10 @@ export class SoftPosProvider {
     }
   }
 
+  /**
+   * Payload lio:// para o app montar o deep link.
+   * NÃO envia accessToken na API — o APK usa BuildConfig (CIELO_ACCESS_TOKEN no build).
+   */
   private cieloPayload(
     input: { valor: number; forma: 'debito' | 'credito'; comandaId: string },
     amountCents: number,
@@ -217,8 +236,8 @@ export class SoftPosProvider {
         input.forma === 'credito' ? 'CREDITO_AVISTA' : 'DEBITO_AVISTA',
       value: String(amountCents),
       reference: input.comandaId,
-      clientID: this.config.get<string>('CIELO_CLIENT_ID') || '',
-      accessToken: this.config.get<string>('CIELO_ACCESS_TOKEN') || '',
+      clientID: this.config.get<string>('CIELO_CLIENT_ID')?.trim() || '',
+      credentials_on_device: true,
     };
   }
 }

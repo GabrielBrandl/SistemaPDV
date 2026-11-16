@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -10,9 +12,9 @@ android {
     defaultConfig {
         applicationId = "com.pdvcashless"
         minSdk = 24
-        targetSdk = 30
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 34
+        versionCode = 4
+        versionName = "1.0.3"
         // Produção EasyPanel (maquininha). Emulador local: http://10.0.2.2:3001/api/v1
         buildConfigField("String", "API_BASE_URL", "\"https://sistema-pdv.129-121-39-17.sslip.io/api/v1\"")
         buildConfigField("String", "PAGBANK_ACTIVATION_CODE", "\"\"")
@@ -45,7 +47,8 @@ android {
         }
         create("cielo") {
             dimension = "store"
-            applicationIdSuffix = ".cielo"
+            // Package único na LIO Store (com.pdvcashless.cielo já estava ocupado)
+            applicationId = "br.com.pyrou.pdvcashless.cielo"
             versionNameSuffix = "-cielo"
             buildConfigField("boolean", "DEMO_PAYMENT", "false")
             buildConfigField("boolean", "HAS_PLUGPAG", "false")
@@ -69,15 +72,47 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val propsFile = rootProject.file("keystore.properties")
+            val props = Properties()
+            if (propsFile.exists()) {
+                propsFile.inputStream().use { props.load(it) }
+            }
+            val ksPath = props.getProperty("storeFile") ?: "app/pdv-cielo.jks"
+            val ksFile = rootProject.file(ksPath)
+            if (ksFile.exists()) {
+                storeFile = ksFile
+                storePassword =
+                    System.getenv("PDV_KEYSTORE_PASSWORD")
+                        ?: props.getProperty("storePassword")
+                keyAlias =
+                    System.getenv("PDV_KEY_ALIAS")
+                        ?: props.getProperty("keyAlias")
+                        ?: "pdvcashless"
+                keyPassword =
+                    System.getenv("PDV_KEY_PASSWORD")
+                        ?: props.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
         }
         debug { }
+    }
+
+    lint {
+        checkReleaseBuilds = true
+        abortOnError = true
+        disable += "ExpiredTargetSdkVersion"
     }
 
     compileOptions {

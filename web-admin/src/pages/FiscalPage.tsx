@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FileText, Printer, RefreshCw, XCircle } from 'lucide-react';
+import { FileText, Printer, RefreshCw, Settings2, XCircle } from 'lucide-react';
 import api from '../services/api';
 
 type PendingOrder = {
@@ -8,6 +8,19 @@ type PendingOrder = {
   total: number;
   criado_em: string;
   itens: { produto: string; qtd: number; preco_unit: number; total: number }[];
+};
+
+type FiscalStatus = {
+  tenant_id: string;
+  provider: string;
+  configurado: boolean;
+  cnpj: string | null;
+  razao_social: string | null;
+  ambiente: string;
+  nfce_serie: number;
+  empresa_uf_codigo: string;
+  focus_nfe_token_masked: string | null;
+  mensagem: string;
 };
 
 type NfceDoc = {
@@ -32,11 +45,27 @@ export function FiscalPage() {
   const [cpf, setCpf] = useState('');
   const [nome, setNome] = useState('');
   const [selectedDoc, setSelectedDoc] = useState<NfceDoc | null>(null);
+  const [cfgToken, setCfgToken] = useState('');
+  const [cfgAmbiente, setCfgAmbiente] = useState('homologacao');
+  const [cfgCnpj, setCfgCnpj] = useState('');
+  const [cfgRazao, setCfgRazao] = useState('');
+  const [cfgSerie, setCfgSerie] = useState('1');
+  const [cfgUf, setCfgUf] = useState('13');
+  const [cfgMsg, setCfgMsg] = useState('');
 
   const { data: status } = useQuery({
     queryKey: ['fiscal-status'],
-    queryFn: async () => (await api.get('/fiscal/status')).data,
+    queryFn: async () => (await api.get('/fiscal/status')).data as FiscalStatus,
   });
+
+  useEffect(() => {
+    if (!status) return;
+    setCfgAmbiente(status.ambiente || 'homologacao');
+    setCfgCnpj(status.cnpj || '');
+    setCfgRazao(status.razao_social || '');
+    setCfgSerie(String(status.nfce_serie || 1));
+    setCfgUf(status.empresa_uf_codigo || '13');
+  }, [status]);
 
   const { data: pendingOrders } = useQuery({
     queryKey: ['fiscal-pending'],
@@ -81,6 +110,31 @@ export function FiscalPage() {
     },
   });
 
+  const configMutation = useMutation({
+    mutationFn: async () => {
+      const body: Record<string, unknown> = {
+        focus_nfe_ambiente: cfgAmbiente,
+        cnpj: cfgCnpj.replace(/\D/g, '') || undefined,
+        razao_social: cfgRazao || undefined,
+        nfce_serie: Number(cfgSerie) || 1,
+        empresa_uf_codigo: cfgUf || undefined,
+      };
+      if (cfgToken.trim()) body.focus_nfe_token = cfgToken.trim();
+      return (await api.patch('/fiscal/config', body)).data as FiscalStatus;
+    },
+    onSuccess: () => {
+      setCfgToken('');
+      setCfgMsg('Configuração fiscal salva');
+      queryClient.invalidateQueries({ queryKey: ['fiscal-status'] });
+    },
+    onError: (e) => {
+      setCfgMsg(
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || 'Falha ao salvar configuração',
+      );
+    },
+  });
+
   const selectedOrder = useMemo(
     () => pendingOrders?.find((o) => o.id === orderId),
     [pendingOrders, orderId],
@@ -111,6 +165,104 @@ export function FiscalPage() {
             {status?.provider === 'focus_nfe' ? 'Focus NFe' : 'Homologação local'}
           </p>
           <p className="text-xs text-slate-500 mt-1 max-w-xs">{status?.mensagem}</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 mb-8">
+        <h3 className="font-semibold mb-1 flex items-center gap-2">
+          <Settings2 size={18} className="text-amber-400" />
+          Configuração Focus NFe (desta empresa)
+        </h3>
+        <p className="text-xs text-slate-500 mb-4">
+          Token Focus é por tenant. Sem token, a emissão usa homologação local.
+          {status?.focus_nfe_token_masked
+            ? ` Token atual: ${status.focus_nfe_token_masked}`
+            : ' Nenhum token salvo.'}
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm text-slate-300">Token Focus NFe</label>
+            <input
+              type="password"
+              value={cfgToken}
+              onChange={(e) => setCfgToken(e.target.value)}
+              placeholder={
+                status?.focus_nfe_token_masked
+                  ? 'Deixe em branco para manter o atual'
+                  : 'Cole o token da Focus'
+              }
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-slate-300">Ambiente</label>
+            <select
+              value={cfgAmbiente}
+              onChange={(e) => setCfgAmbiente(e.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            >
+              <option value="homologacao">Homologação</option>
+              <option value="producao">Produção</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm text-slate-300">CNPJ (14 dígitos)</label>
+            <input
+              value={cfgCnpj}
+              onChange={(e) => setCfgCnpj(e.target.value)}
+              maxLength={18}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-slate-300">Razão social</label>
+            <input
+              value={cfgRazao}
+              onChange={(e) => setCfgRazao(e.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-slate-300">Série NFC-e</label>
+            <input
+              type="number"
+              min={1}
+              value={cfgSerie}
+              onChange={(e) => setCfgSerie(e.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-slate-300">Código UF IBGE</label>
+            <input
+              value={cfgUf}
+              onChange={(e) => setCfgUf(e.target.value)}
+              placeholder="13 = AM"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 mt-1"
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setCfgMsg('');
+              configMutation.mutate();
+            }}
+            disabled={configMutation.isPending}
+            className="rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold px-4 py-2 disabled:opacity-50"
+          >
+            {configMutation.isPending ? 'Salvando...' : 'Salvar configuração fiscal'}
+          </button>
+          {cfgMsg && (
+            <p
+              className={`text-sm ${
+                configMutation.isError ? 'text-red-400' : 'text-emerald-400'
+              }`}
+            >
+              {cfgMsg}
+            </p>
+          )}
         </div>
       </div>
 

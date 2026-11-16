@@ -34,6 +34,7 @@ import { RefundDto } from './dto/refund.dto';
 import { AuditService } from '../audit/audit.service';
 import { CashService } from '../cash/cash.service';
 import { PixProvider } from '../payments/pix.provider';
+import { SoftPosProvider } from '../payments/softpos.provider';
 
 const RESERVE_TTL_MS = 60_000;
 
@@ -54,6 +55,7 @@ export class CardsService {
     private readonly audit: AuditService,
     private readonly cash: CashService,
     private readonly pix: PixProvider,
+    private readonly softpos: SoftPosProvider,
   ) {}
 
   private normalizeUid(uid: string): string {
@@ -165,6 +167,7 @@ export class CardsService {
     let qrPayload: string | null = null;
     let providerRef: string | null = null;
     let softposInstruction: string | null = null;
+    let softposRequest: Record<string, unknown> | null = null;
 
     if (isPix) {
       const charge = await this.pix.createCharge({
@@ -178,9 +181,18 @@ export class CardsService {
       qrPayload = charge.qrPayload;
       providerRef = charge.providerRef;
     } else if (forma !== 'dinheiro') {
-      softposInstruction =
-        'Aproxime o cartão do cliente na maquininha para concluir a recarga';
-      provider = dto.provider || process.env.SOFTPOS_PROVIDER || 'demo';
+      const softForma =
+        forma === 'cartao_credito' ? ('credito' as const) : ('debito' as const);
+      const session = await this.softpos.createSession({
+        valor: dto.valor,
+        forma: softForma,
+        comandaId: `recharge:${card.id}`,
+        provider: dto.provider,
+      });
+      provider = session.provider;
+      providerRef = session.providerRef;
+      softposInstruction = session.instruction;
+      softposRequest = session.softposRequest as Record<string, unknown>;
     } else {
       throw new BadRequestException(
         'Para dinheiro, use POST /recharge diretamente com caixa aberto',
@@ -224,6 +236,7 @@ export class CardsService {
       pix_copia_cola: intent.pixCopiaCola,
       qr_payload: intent.qrPayload,
       softpos_instruction: intent.softposInstruction,
+      softpos_request: softposRequest,
       demo_mode: intent.provider === 'demo',
       expires_at: intent.expiresAt,
       mensagem:

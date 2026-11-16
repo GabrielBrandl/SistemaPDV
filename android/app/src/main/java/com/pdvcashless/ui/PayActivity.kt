@@ -16,6 +16,7 @@ import com.pdvcashless.gateway.CieloGateway
 import com.pdvcashless.gateway.MercadoPagoGateway
 import com.pdvcashless.gateway.PaymentGatewayFactory
 import com.pdvcashless.gateway.PaymentType
+import com.pdvcashless.gateway.SoftPosSession
 import com.pdvcashless.gateway.TerminalActivityHolder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -89,12 +90,20 @@ class PayActivity : AppCompatActivity() {
                     )
                 }
 
-                val cents = (Math.round(intentDto.valor * 100)).toInt()
-                val terminal = PaymentGatewayFactory.get().doPayment(
-                    amountCents = cents,
-                    type = type,
-                    userReference = intentDto.id.take(10),
+                SoftPosSession.applyCielo(
+                    intentDto.softpos_request?.cielo?.clientID,
+                    intentDto.softpos_request?.cielo?.accessToken,
                 )
+                val cents = (Math.round(intentDto.valor * 100)).toInt()
+                val terminal = try {
+                    PaymentGatewayFactory.get().doPayment(
+                        amountCents = cents,
+                        type = type,
+                        userReference = intentDto.id.take(10),
+                    )
+                } finally {
+                    SoftPosSession.clear()
+                }
 
                 if (terminal.awaitRemote) {
                     binding.txtPayStatus.text = terminal.message

@@ -11,6 +11,7 @@ import {
   Menu,
   Package,
   Plug,
+  Printer,
   Radio,
   Receipt,
   RefreshCw,
@@ -51,6 +52,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   '/products': ShoppingBag,
   '/reports': Receipt,
   '/pdv': Radio,
+  '/printers': Printer,
   '/fiscal': Package,
   '/integrations': Plug,
 };

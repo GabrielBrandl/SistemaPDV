@@ -16,6 +16,7 @@ import {
 } from '../database/entities';
 import { CardsService } from '../cards/cards.service';
 import { FiscalService } from '../fiscal/fiscal.service';
+import { PrintersService } from '../printers/printers.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { AddItemsDto } from './dto/add-items.dto';
 import { CheckoutDto } from './dto/checkout.dto';
@@ -29,6 +30,7 @@ export class OrdersService {
     private readonly cardsService: CardsService,
     @Inject(forwardRef(() => FiscalService))
     private readonly fiscalService: FiscalService,
+    private readonly printersService: PrintersService,
   ) {}
 
   async create(tenantId: string, dto: CreateOrderDto) {
@@ -118,11 +120,20 @@ export class OrdersService {
       });
     }
 
+    const paid = await this.findOne(tenantId, order.id);
+    let print = null;
+    try {
+      print = await this.printersService.printOrderPaid(tenantId, paid);
+    } catch {
+      print = { printed: [], skipped: 'falha na impressao' };
+    }
+
     return {
       order_id: order.id,
       ...confirm,
       total: Number(order.total),
       nfce,
+      print,
     };
   }
 

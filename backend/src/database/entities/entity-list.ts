@@ -25,6 +25,7 @@ import { CashSession } from './cash-session.entity';
 import { CashMovement } from './cash-movement.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { Lead } from './lead.entity';
+import { Printer } from './printer.entity';
 
 export const entityList = [
   Tenant,
@@ -54,4 +55,5 @@ export const entityList = [
   CashMovement,
   RefreshToken,
   Lead,
+  Printer,
 ];

@@ -90,6 +90,20 @@ data class SoftPosRequestDto(
     val type: String,
     val reference: String,
     val provider: String,
+    val terminal: String? = null,
+    val cielo: CieloSoftPosDto? = null,
+)
+
+/** Payload lio:// do backend quando SOFTPOS_PROVIDER=cielo */
+data class CieloSoftPosDto(
+    val scheme: String? = null,
+    val host: String? = null,
+    val callback: String? = null,
+    val paymentCode: String? = null,
+    val value: String? = null,
+    val reference: String? = null,
+    val clientID: String? = null,
+    val accessToken: String? = null,
 )
 
 data class ConfirmPaymentRequest(

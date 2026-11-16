@@ -64,6 +64,16 @@ export class FocusNfeProvider {
     payload: NfceEmitPayload,
   ): Promise<NfceEmitResult> {
     const ambiente = tenant.focusNfeAmbiente || 'homologacao';
+    const cnpj = (tenant.cnpj || '').replace(/\D/g, '');
+    if (cnpj.length !== 14) {
+      return {
+        sucesso: false,
+        mensagem_erro:
+          'CNPJ do emitente inválido — configure o CNPJ (14 dígitos) em /fiscal',
+        ambiente,
+        provider: 'focus_nfe',
+      };
+    }
     const body = {
       natureza_operacao: 'VENDA AO CONSUMIDOR',
       data_emissao: new Date().toISOString(),
@@ -73,7 +83,7 @@ export class FocusNfeProvider {
       consumidor_final: 1,
       presenca_comprador: 1,
       modalidade_frete: 9,
-      cnpj_emitente: tenant.cnpj,
+      cnpj_emitente: cnpj,
       nome_destinatario: payload.cliente_nome || undefined,
       cpf_destinatario: payload.cliente_cpf || undefined,
       items: payload.itens.map((item, index) => ({

@@ -15,6 +15,10 @@ export class UpdateProductDto {
   categoria?: string;
 
   @IsOptional()
+  @IsString()
+  print_station?: string;
+
+  @IsOptional()
   @IsBoolean()
   ativo?: boolean;
 

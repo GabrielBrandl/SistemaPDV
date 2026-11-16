@@ -16,6 +16,7 @@ import { ProductsPage } from './pages/ProductsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { PdvPage } from './pages/PdvPage';
 import { FiscalPage } from './pages/FiscalPage';
+import { PrintersPage } from './pages/PrintersPage';
 import { TenantsPage } from './pages/TenantsPage';
 import { PlatformDashboardPage } from './pages/PlatformDashboardPage';
 import { CompanyDetailPage } from './pages/CompanyDetailPage';
@@ -113,6 +114,7 @@ export function App() {
           </Route>
           <Route element={<ProtectedRoute permission="terminals.manage" />}>
             <Route path="/pdv" element={<PdvPage />} />
+            <Route path="/printers" element={<PrintersPage />} />
           </Route>
           <Route element={<ProtectedRoute permission="fiscal.manage" />}>
             <Route path="/fiscal" element={<FiscalPage />} />

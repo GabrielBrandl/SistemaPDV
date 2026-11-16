@@ -4,7 +4,7 @@ import { Comanda, PaymentIntent } from '../database/entities';
 import { ComandasModule } from '../comandas/comandas.module';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
-import { SoftPosProvider } from './softpos.provider';
+import { SoftPosModule } from './softpos.module';
 import { PixModule } from './pix.module';
 
 @Module({
@@ -12,9 +12,10 @@ import { PixModule } from './pix.module';
     TypeOrmModule.forFeature([PaymentIntent, Comanda]),
     forwardRef(() => ComandasModule),
     PixModule,
+    SoftPosModule,
   ],
-  providers: [PaymentsService, SoftPosProvider],
+  providers: [PaymentsService],
   controllers: [PaymentsController],
-  exports: [PaymentsService, PixModule],
+  exports: [PaymentsService, SoftPosModule, PixModule],
 })
 export class PaymentsModule {}

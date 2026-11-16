@@ -30,6 +30,10 @@ export class Product {
   @Column({ nullable: true, type: 'varchar' })
   categoria: string | null;
 
+  /** Estação de impressão: BAR | COZINHA | CAIXA | NENHUMA | null (auto pela categoria) */
+  @Column({ name: 'print_station', nullable: true, type: 'varchar', length: 16 })
+  printStation: string | null;
+
   @Column({ default: true })
   ativo: boolean;
 

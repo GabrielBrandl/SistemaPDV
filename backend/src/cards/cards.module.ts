@@ -12,6 +12,7 @@ import {
 } from '../database/entities';
 import { CashModule } from '../cash/cash.module';
 import { PixModule } from '../payments/pix.module';
+import { SoftPosModule } from '../payments/softpos.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PixModule } from '../payments/pix.module';
     ]),
     CashModule,
     PixModule,
+    SoftPosModule,
   ],
   providers: [CardsService],
   controllers: [CardsController],

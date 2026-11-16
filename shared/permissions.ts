@@ -145,6 +145,7 @@ export const NAV_BY_PERMISSION: { to: string; label: string; permission: Permiss
   { to: '/products', label: 'Cardápio', permission: 'products.manage' },
   { to: '/reports', label: 'Relatórios', permission: 'reports.view' },
   { to: '/pdv', label: 'Terminais', permission: 'terminals.manage' },
+  { to: '/printers', label: 'Impressoras', permission: 'terminals.manage' },
   { to: '/fiscal', label: 'Emissor NFC-e', permission: 'fiscal.manage' },
   { to: '/integrations', label: 'Integrações', permission: 'integrations.manage' },
 ];

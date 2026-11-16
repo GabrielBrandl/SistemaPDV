@@ -15,6 +15,11 @@ export class CreateProductDto {
   @IsString()
   categoria?: string;
 
+  /** BAR | COZINHA | CAIXA | NENHUMA — null = auto pela categoria */
+  @IsOptional()
+  @IsString()
+  print_station?: string;
+
   @IsOptional()
   @IsBoolean()
   ativo?: boolean;

@@ -44,9 +44,9 @@ export class TenantsController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin', 'admin')
+  @Roles('super_admin', 'admin', 'platform_admin', 'tenant_admin')
   findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    if (user.role !== 'super_admin' && user.tenantId !== id) {
+    if (user.role !== 'super_admin' && user.role !== 'platform_admin' && user.tenantId !== id) {
       return this.tenantsService.findOne(user.tenantId!);
     }
     return this.tenantsService.findOne(id);
@@ -61,14 +61,16 @@ export class TenantsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('super_admin', 'admin')
+  @Roles('super_admin', 'admin', 'platform_admin', 'tenant_admin')
   update(
     @Param('id') id: string,
     @Body() dto: UpdateTenantDto,
     @CurrentUser() user: AuthUser,
   ) {
-    const targetId = user.role === 'super_admin' ? id : user.tenantId!;
-    if (user.role === 'admin') {
+    const isPlatform =
+      user.role === 'super_admin' || user.role === 'platform_admin';
+    const targetId = isPlatform ? id : user.tenantId!;
+    if (!isPlatform) {
       const {
         plano,
         status,

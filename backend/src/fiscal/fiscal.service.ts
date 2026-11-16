@@ -15,6 +15,7 @@ import {
   Tenant,
 } from '../database/entities';
 import { EmitNfceDto } from './dto/emit-nfce.dto';
+import { UpdateFiscalConfigDto } from './dto/update-fiscal-config.dto';
 import { FocusNfeProvider } from './focus-nfe.provider';
 
 @Injectable()
@@ -35,20 +36,55 @@ export class FiscalService {
     return tenant;
   }
 
+  private maskToken(token: string | null | undefined) {
+    const t = token?.trim();
+    if (!t) return null;
+    if (t.length <= 8) return '****';
+    return `${t.slice(0, 4)}…${t.slice(-4)}`;
+  }
+
   async getStatus(tenantId: string) {
     const tenant = await this.getTenant(tenantId);
+    const configurado = this.focusNfe.isConfigured(tenant);
     return {
       tenant_id: tenant.id,
-      provider: this.focusNfe.isConfigured(tenant)
-        ? 'focus_nfe'
-        : 'local_homologacao',
-      configurado: this.focusNfe.isConfigured(tenant),
+      provider: configurado ? 'focus_nfe' : 'local_homologacao',
+      configurado,
       cnpj: tenant.cnpj,
-      ambiente: tenant.focusNfeAmbiente,
-      mensagem: this.focusNfe.isConfigured(tenant)
-        ? 'Focus NFe configurada neste tenant'
-        : 'Modo homologação local — configure o token Focus NFe no tenant',
+      razao_social: tenant.razaoSocial,
+      ambiente: tenant.focusNfeAmbiente || 'homologacao',
+      nfce_serie: tenant.nfceSerie || 1,
+      empresa_uf_codigo: tenant.empresaUfCodigo || '13',
+      focus_nfe_token_masked: this.maskToken(tenant.focusNfeToken),
+      mensagem: configurado
+        ? 'Focus NFe configurada neste tenant — emissões usam a API Focus'
+        : 'Modo homologação local — configure o token Focus NFe abaixo para produção',
     };
+  }
+
+  async updateConfig(tenantId: string, dto: UpdateFiscalConfigDto) {
+    const tenant = await this.getTenant(tenantId);
+    if (dto.focus_nfe_token !== undefined) {
+      const trimmed = dto.focus_nfe_token.trim();
+      tenant.focusNfeToken = trimmed.length ? trimmed : null;
+    }
+    if (dto.focus_nfe_ambiente !== undefined) {
+      tenant.focusNfeAmbiente = dto.focus_nfe_ambiente;
+    }
+    if (dto.cnpj !== undefined) {
+      tenant.cnpj = dto.cnpj.replace(/\D/g, '');
+    }
+    if (dto.razao_social !== undefined) {
+      tenant.razaoSocial = dto.razao_social.trim() || null;
+    }
+    if (dto.empresa_uf_codigo !== undefined) {
+      tenant.empresaUfCodigo = dto.empresa_uf_codigo;
+    }
+    if (dto.nfce_serie !== undefined) {
+      tenant.nfceSerie = dto.nfce_serie;
+    }
+    await this.tenantsRepo.save(tenant);
+    return this.getStatus(tenantId);
   }
 
   async listPaidOrdersWithoutNfce(tenantId: string) {
@@ -229,6 +265,12 @@ export class FiscalService {
   </div>
 </body>
 </html>`;
+  }
+
+  rejectDemoInProduction() {
+    throw new BadRequestException(
+      'Pedido demo fiscal desabilitado em produção',
+    );
   }
 
   async createDemoPaidOrder(tenantId: string) {

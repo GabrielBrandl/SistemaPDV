@@ -57,6 +57,11 @@ CIELO_ACCESS_TOKEN=seu_access_token
 
 Reinicie o serviço `sistema-pdv`.
 
+Com `SOFTPOS_PROVIDER=cielo`, `POST /payments/card` **sempre** cria sessão e devolve `softpos_request.cielo` (Deep Link `lio://`).  
+`CIELO_*` no backend são recomendados (mesmo par do APK), mas **não bloqueiam** o pagamento on-device se o flavor `cielo` já tiver as credenciais no BuildConfig.
+
+Checklist consolidado: `DEPLOY_UPDATE.md`.
+
 ---
 
 ## 4. Gerar o APK Cielo
