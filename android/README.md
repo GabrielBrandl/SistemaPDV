@@ -4,12 +4,12 @@ App nativo (WebView **não** entra nas lojas PagBank / Cielo Smart / Point).
 
 ## Flavors
 
-| Flavor | Terminal | Pagamento |
-|--------|----------|-----------|
-| `demo` | Emulador / celular | Simulado |
-| `pagbank` | Moderninha / SmartPOS PagBank | PlugPag |
-| `cielo` | Cielo Smart (LIO / DX) | Deep Link `lio://payment` |
-| `mercadopago` | Mercado Pago Point Smart | Point API + intent nativo |
+| Flavor | Terminal | Pagamento | applicationId |
+|--------|----------|-----------|---------------|
+| `demo` | Emulador / celular | Simulado | `com.pdvcashless.demo` |
+| `pagbank` | Moderninha / SmartPOS PagBank | PlugPag | `com.pdvcashless` |
+| `cielo` | Cielo Smart (LIO / DX) | Deep Link `lio://payment` | **`br.com.pyrou.pdvcashless.cielo`** |
+| `mercadopago` | Mercado Pago Point Smart | Point API + intent nativo | `com.pdvcashless.mp` |
 
 ## Abrir no Android Studio
 
@@ -18,21 +18,23 @@ App nativo (WebView **não** entra nas lojas PagBank / Cielo Smart / Point).
 3. Selecione a variante (`cieloDebug`, `mercadopagoDebug`, `pagbankDebug` ou `demoDebug`)
 4. `API_BASE_URL` já aponta para a API de produção EasyPanel. Na tela de login dá para trocar.
 
-## Build
+## Build Cielo (loja / homologação)
 
-```bat
-gradlew.bat :app:assembleCieloRelease
-gradlew.bat :app:assembleMercadopagoRelease
-gradlew.bat :app:assemblePagbankRelease
-gradlew.bat :app:assembleDemoDebug
+```bash
+cp keystore.properties.example keystore.properties
+# preencha senhas + CIELO_CLIENT_ID + CIELO_ACCESS_TOKEN
+./scripts/build-cielo-release.sh
 ```
 
-Cielo (credenciais no build):
+APK de upload: `../apks/PDV-Cielo.apk`
 
-```powershell
-$env:CIELO_CLIENT_ID="..."
-$env:CIELO_ACCESS_TOKEN="..."
-gradlew.bat :app:assembleCieloRelease
+## Build manual
+
+```bash
+./gradlew :app:assembleCieloRelease
+./gradlew :app:assembleMercadopagoRelease
+./gradlew :app:assemblePagbankRelease
+./gradlew :app:assembleDemoDebug
 ```
 
 ## Fluxo

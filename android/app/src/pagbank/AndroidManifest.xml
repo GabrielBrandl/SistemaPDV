@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="br.com.uol.pagseguro.permission.PLUGPAGSERVICE" />
+
+    <application>
+        <activity android:name="com.pdvcashless.ui.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="payment" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

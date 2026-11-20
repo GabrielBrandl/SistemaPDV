@@ -4,25 +4,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Bind ao serviço PlugPag embarcado na Moderninha / SmartPOS PagBank -->
-    <uses-permission android:name="br.com.uol.pagseguro.permission.PLUGPAGSERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false" />
 
+    <!-- Cielo Smart UriApp (obrigatório Android 11+) -->
     <queries>
+        <package android:name="com.ads.lio.uriappclient" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="lio" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="mercadopago" />
-        </intent>
-        <intent>
-            <action android:name="com.mercadopago.PAYMENT" />
         </intent>
     </queries>
 
@@ -50,12 +45,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- App padrão de pagamento no terminal PagBank -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="payment" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -77,20 +66,17 @@
                     android:scheme="order"
                     android:host="response" />
             </intent-filter>
-            <!-- Callback Mercado Pago Point -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="pdvcashless"
-                    android:host="mp-point" />
-            </intent-filter>
         </activity>
 
         <activity
             android:name=".ui.ExitActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <!-- Mantém o PDV vivo enquanto o app de pagamento Cielo está em foreground -->
+        <service
+            android:name=".gateway.PaymentKeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 </manifest>

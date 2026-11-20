@@ -11,6 +11,9 @@
     <string name="btn_pay_credit">Crédito</string>
     <string name="btn_release">Liberar saída</string>
     <string name="nfc_hint">Aproxime a pulseira NFC</string>
-    <string name="login_terminal">SmartPOS · Cielo · Mercado Pago · PagBank</string>
+    <string name="login_terminal">SmartPOS · Terminal de pagamento</string>
     <string name="hint_activation">Código de ativação do terminal (opcional no demo)</string>
+    <string name="payment_keepalive_channel">Pagamento no terminal</string>
+    <string name="payment_keepalive_title">PDV · pagamento em andamento</string>
+    <string name="payment_keepalive_text">Aguardando retorno da maquininha. Não force o encerramento do app.</string>
 </resources>

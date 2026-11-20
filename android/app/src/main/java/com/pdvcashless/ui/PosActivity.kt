@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.pdvcashless.BuildConfig
 import com.pdvcashless.R
 import com.pdvcashless.api.AddItemDto
 import com.pdvcashless.api.AddItemsRequest
@@ -33,7 +34,10 @@ class PosActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.listProducts.layoutManager = GridLayoutManager(this, 2)
-        binding.inputUid.setText("04A3B2112233")
+        // UID de demo só no flavor demo — evita reprova na loja Cielo/Point/PagBank.
+        if (BuildConfig.DEMO_PAYMENT) {
+            binding.inputUid.setText("04A3B2112233")
+        }
 
         binding.btnTap.setOnClickListener { tap(binding.inputUid.text.toString()) }
         binding.btnPay.setOnClickListener {

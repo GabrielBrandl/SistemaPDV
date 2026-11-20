@@ -18,12 +18,11 @@ const CONTACT_EMAIL = 'contato@pyrou.com.br';
 const CONTACT_MAILTO = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
   'Quero conhecer o PDV Cashless',
 )}`;
-/** WhatsApp comercial — atualize o DDI+número quando disponível */
-const WHATSAPP_NUMBER = '5511999999999';
+const WHATSAPP_NUMBER = '5592992688706';
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   'Quero conhecer o PDV Cashless',
 )}`;
-const HAS_WHATSAPP = false;
+const HAS_WHATSAPP = true;
 
 const PLAN_DISPLAY: Record<
   string,
@@ -217,8 +216,13 @@ function Hero() {
             <Link to="/onboard" className="lp-btn lp-btn-amber">
               Teste grátis
             </Link>
-            <a href="#como" className="lp-btn lp-btn-ghost">
-              Ver como funciona
+            <a
+              href={WHATSAPP_URL}
+              className="lp-btn lp-btn-ghost"
+              target="_blank"
+              rel="noreferrer"
+            >
+              WhatsApp
             </a>
           </div>
           <p className="lp-trust">
@@ -604,9 +608,14 @@ function LeadSection() {
         {done ? (
           <div className="lp-form is-ok" role="status">
             <h3>Recebemos! Respondemos em até 1 dia útil.</h3>
-            <p>Se preferir, fale agora por e-mail.</p>
-            <a className="lp-btn lp-btn-amber" href={CONTACT_MAILTO}>
-              Falar por e-mail
+            <p>Se preferir, fale agora pelo WhatsApp.</p>
+            <a
+              className="lp-btn lp-btn-amber"
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Falar no WhatsApp
             </a>
           </div>
         ) : (

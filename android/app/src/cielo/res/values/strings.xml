@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PDV Cielo</string>
-    <string name="login_terminal">Cielo Smart · LIO / DX</string>
-    <string name="hint_activation">Client ID Cielo (portal de desenvolvedores)</string>
+    <!-- Sem marca de adquirente no nome/UI — exigência Cielo Store -->
+    <string name="app_name">PDV Cashless</string>
+    <string name="login_terminal">Smart POS · Terminal de pagamento</string>
+    <string name="hint_activation">Código / Client ID do terminal (opcional)</string>
 </resources>

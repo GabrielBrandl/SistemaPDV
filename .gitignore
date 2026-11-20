@@ -40,9 +40,12 @@ android/.gradle/
 android/**/build/
 android/local.properties
 android/**/captures/
+android/keystore.properties
+android/**/*.jks
 *.apk
 *.aab
 *.keystore
+*.jks
 
 # Nest / TypeScript
 backend/dist/
@@ -51,6 +54,7 @@ backend/dist/
 # Misc
 .turbo/
 .cache/
+.tools/
 
 apks/*.apk
 android/local.properties

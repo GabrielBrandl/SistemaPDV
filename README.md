@@ -153,11 +153,15 @@ Header opcional para super admin: `X-Tenant-Id`
 
 Cielo e Mercado Pago **não instalam o site** no terminal. É o APK nativo + credenciais do portal:
 
-- Cielo: `CIELO_CLIENT_ID` + `CIELO_ACCESS_TOKEN` (portal de desenvolvedores)
+- **Cielo Store:** enviar `apks/PDV-Cielo.apk` (flavor `cielo`, package `br.com.pyrou.pdvcashless.cielo`)
+  - Build: `android/scripts/build-cielo-release.sh`
+  - Credenciais: `CIELO_CLIENT_ID` + `CIELO_ACCESS_TOKEN` no build
 - Mercado Pago: `MERCADOPAGO_ACCESS_TOKEN` + `MERCADOPAGO_TERMINAL_ID` (Suas integrações)
 - PagBank: código de ativação PlugPag
 
 Sem essas chaves o fluxo de **comanda/NFC/UI** já funciona no flavor `demo`. O dinheiro real só entra depois da homologação de cada loja (Cielo Smart, Point, PagBank).
+
+Detalhes anti-reprova Cielo: `docs/INSTALACAO_MAQUININHA_CIELO.md`
 
 ## Cartão NFC de Teste
 

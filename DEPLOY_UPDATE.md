@@ -43,9 +43,9 @@ $env:CIELO_ACCESS_TOKEN="seu_access_token"
 - [ ] Build flavor **`cielo`** com o **mesmo** `CIELO_CLIENT_ID` / `CIELO_ACCESS_TOKEN` do backend
 - [ ] Instalar APK no terminal (`br.com.pyrou.pdvcashless.cielo`)
 - [ ] URL da API HTTPS apontando para o backend
-- [ ] Login operador (bartender / cashier)
-- [ ] Teste: pulseira → item → Débito/Crédito → Deep Link `lio://` → retorno `order://response`
-- [ ] Homologação / loja Cielo Smart se for distribuição oficial
+- [ ] Login operador (bartender / cashier) — **sem** e-mail/senha de demo pré-preenchidos
+- [ ] Teste: pulseira → item → Débito/Crédito → Deep Link `lio://` + FGS → retorno `order://response`
+- [ ] Homologação: enviar `apks/PDV-Cielo.apk` na Cielo Store (mesmo package + keystore)
 
 ## 3. NFC-e (Focus NFe) por empresa
 
@@ -101,4 +101,6 @@ API: `GET/POST/PATCH/DELETE /api/v1/printers` · `POST /api/v1/printers/:id/test
 3. APK sem `CIELO_*` no BuildConfig **e** backend sem `CIELO_*` (nenhuma fonte de credencial)
 4. Terminal sem app de pagamento Cielo / emulador errado
 5. API HTTP (não HTTPS) ou URL incorreta no app
-6. Pacote/`applicationId` diferente do cadastrado na loja Cielo
+6. Pacote/`applicationId` diferente do cadastrado na loja Cielo (`br.com.pyrou.pdvcashless.cielo`)
+7. Falta de `<queries>` para `com.ads.lio.uriappclient` ou de foreground service no pagamento
+8. APK debug / não assinado / targetSdk fora do pré-requisito (24/29)

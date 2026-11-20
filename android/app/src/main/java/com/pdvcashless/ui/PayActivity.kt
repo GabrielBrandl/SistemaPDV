@@ -15,6 +15,7 @@ import com.pdvcashless.databinding.ActivityPayBinding
 import com.pdvcashless.gateway.CieloGateway
 import com.pdvcashless.gateway.MercadoPagoGateway
 import com.pdvcashless.gateway.PaymentGatewayFactory
+import com.pdvcashless.gateway.PaymentKeepAliveService
 import com.pdvcashless.gateway.PaymentType
 import com.pdvcashless.gateway.SoftPosSession
 import com.pdvcashless.gateway.TerminalActivityHolder
@@ -56,6 +57,10 @@ class PayActivity : AppCompatActivity() {
     override fun onDestroy() {
         if (TerminalActivityHolder.current === this) {
             TerminalActivityHolder.current = null
+        }
+        // Se a Activity morrer sem callback, evita notificação órfã.
+        if (isFinishing) {
+            PaymentKeepAliveService.stop(applicationContext)
         }
         super.onDestroy()
     }
@@ -101,9 +106,11 @@ class PayActivity : AppCompatActivity() {
                         type = type,
                         userReference = intentDto.id.take(10),
                     )
-                } finally {
+                } catch (e: Exception) {
                     SoftPosSession.clear()
+                    throw e
                 }
+                SoftPosSession.clear()
 
                 if (terminal.awaitRemote) {
                     binding.txtPayStatus.text = terminal.message

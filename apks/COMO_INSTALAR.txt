@@ -1,41 +1,49 @@
 PDV Cashless — Cielo Smart e Mercado Pago Point
 ================================================
 
-URL do sistema (novo EasyPanel):
-  http://sistema-pdv.129-121-39-17.sslip.io/
-
-Painel EasyPanel:
-  http://129.121.39.17:3000/
-  Projeto: sistema-pdv  |  Serviço compose: app
+URL do sistema (EasyPanel):
+  https://sistema-pdv.129-121-39-17.sslip.io/
 
 APKs:
 
   PDV-Cielo.apk        → maquininha Cielo Smart (LIO / DX)
+                         package: br.com.pyrou.pdvcashless.cielo
+                         ← ESTE arquivo sobe na Cielo Store
+
   PDV-MercadoPago.apk  → maquininha Mercado Pago Point Smart
 
 Não instale os dois no mesmo terminal.
 
 
-1. Instalar
------------
+1. Gerar APK Cielo (homologação / loja)
+---------------------------------------
+  cd android
+  cp keystore.properties.example keystore.properties
+  # preencha CIELO_CLIENT_ID, CIELO_ACCESS_TOKEN e senhas do JKS
+  ./scripts/build-cielo-release.sh
+
+  Saída: apks/PDV-Cielo.apk
+
+
+2. Instalar no terminal
+-----------------------
 1. Wi-Fi no terminal
-2. Copie o APK (USB / adb install)
-3. Abra o app
+2. Copie o APK (USB / adb install / loja após aprovação)
+3. Abra o app "PDV Cashless"
 4. URL da API:
-   http://sistema-pdv.129-121-39-17.sslip.io/api/v1
-5. Login operador:
-   operador@pdv.local / operador123
+   https://sistema-pdv.129-121-39-17.sslip.io/api/v1
+5. Login operador (credenciais do tenant — não há demo pré-preenchido)
 
 
-2. Uso
+3. Uso
 ------
 Pulseira NFC → produtos → PAGAR → PIX / Débito / Crédito
 
 
-3. Cobrança real
+4. Cobrança real
 ----------------
-Cielo: Client ID + Access Token no portal + env do EasyPanel
-Mercado Pago: Access Token + terminal_id no EasyPanel (Environment do serviço app)
+Cielo: Client ID + Access Token no portal + embutidos no build do APK
+Mercado Pago: Access Token + terminal_id no EasyPanel
 
 Guias:
   docs/INSTALACAO_MAQUININHA_CIELO.md

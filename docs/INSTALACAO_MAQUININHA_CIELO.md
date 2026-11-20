@@ -20,7 +20,7 @@ Fluxo:
 2. Lê pulseira NFC  
 3. Lança produtos  
 4. Toca PIX / Débito / Crédito  
-5. O app abre o pagamento Cielo (`lio://payment`)  
+5. O app abre o pagamento Cielo (`lio://payment`) com **foreground service**  
 6. Cielo devolve o resultado em `order://response`  
 7. O PDV confirma no backend  
 
@@ -38,9 +38,13 @@ No `AndroidManifest` o app já declara:
 
 ```xml
 <meta-data android:name="cs_integration_type" android:value="uri" />
+<queries>
+  <package android:name="com.ads.lio.uriappclient" />
+</queries>
 ```
 
-Sem esse metadata a Cielo responde *metadata de integração não encontrado*.
+Sem o metadata a Cielo responde *metadata de integração não encontrado*.  
+Sem o `<queries>` (Android 11+) o sistema bloqueia o deep link para o UriApp.
 
 ---
 
@@ -64,23 +68,42 @@ Checklist consolidado: `DEPLOY_UPDATE.md`.
 
 ---
 
-## 4. Gerar o APK Cielo
+## 4. Gerar o APK Cielo (arquivo da loja)
+
+**Package ID (cadastrar na Cielo Store):** `br.com.pyrou.pdvcashless.cielo`  
+**Arquivo a enviar:** `apks/PDV-Cielo.apk` (ou `app-cielo-release.apk`)
 
 1. Android Studio → pasta `android/`  
-2. **Build Variants** → `cieloRelease` (ou `cieloDebug` na homologação)  
-3. Passe as credenciais no ambiente **antes** do Gradle:
+2. **Build Variants** → `cieloRelease`  
+3. Configure assinatura + credenciais:
 
-Windows (PowerShell):
-
-```powershell
-$env:CIELO_CLIENT_ID="seu_client_id"
-$env:CIELO_ACCESS_TOKEN="seu_access_token"
-.\gradlew.bat :app:assembleCieloRelease
+```bash
+cp android/keystore.properties.example android/keystore.properties
+# edite storePassword, keyPassword, CIELO_CLIENT_ID, CIELO_ACCESS_TOKEN
+# gere o JKS se ainda não existir:
+keytool -genkeypair -v -keystore android/app/pdv-cielo.jks \
+  -alias pdvcashless -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-APK:
+4. Build:
 
-`android/app/build/outputs/apk/cielo/release/app-cielo-release.apk`
+```bash
+cd android
+./scripts/build-cielo-release.sh
+```
+
+Ou manualmente:
+
+```bash
+export CIELO_CLIENT_ID="seu_client_id"
+export CIELO_ACCESS_TOKEN="seu_access_token"
+./gradlew :app:assembleCieloRelease
+```
+
+APK gerado:
+
+`android/app/build/outputs/apk/cielo/release/app-cielo-release.apk`  
+→ copiado para `apks/PDV-Cielo.apk`
 
 ---
 
@@ -89,39 +112,44 @@ APK:
 1. Wi‑Fi no terminal  
 2. Instale o APK (ADB ou loja Cielo após homologação)  
 3. Abra **PDV Cielo**  
-4. URL da API: `https://sistema-pdv.9nb5f0.easypanel.host/api/v1` (ou seu domínio)  
-5. Login operador  
+4. URL da API: `https://sistema-pdv.129-121-39-17.sslip.io/api/v1` (ou seu domínio HTTPS)  
+5. Login operador (sem credenciais de demo pré-preenchidas)  
 6. Teste: pulseira → item → Débito → confirmar na tela Cielo  
 
-A Cielo exige **foreground** durante o pagamento. Não force o app para segundo plano no checkout.
+A Cielo exige **foreground** durante o pagamento. O app inicia `PaymentKeepAliveService` antes do `lio://`.
 
 ---
 
-## 6. Homologação Cielo
+## 6. Homologação Cielo Store
 
-1. Cadastre o pacote `com.pdvcashless.cielo` no portal  
-2. Grave o fluxo completo  
-3. Envie o APK para a loja Cielo Smart  
-4. Após aprovação, instale pelo catálogo do terminal  
+1. Cadastre o pacote **`br.com.pyrou.pdvcashless.cielo`** no portal  
+2. Grave o fluxo completo (débito, crédito, PIX se habilitado)  
+3. Envie o APK **release assinado** (`PDV-Cielo.apk`)  
+4. Após aprovação, promova para produção e instale pelo catálogo do terminal  
+
+### Checklist anti-reprova (já no projeto)
+
+- [x] `cs_integration_type=uri`
+- [x] `<queries>` → `com.ads.lio.uriappclient`
+- [x] Callback `order://response` na `PayActivity`
+- [x] Foreground service durante o pagamento
+- [x] `minSdk 24` / `targetSdk 29` (pré-requisito Cielo Smart)
+- [x] Sem WebView como app principal
+- [x] Sem e-mail/senha/UID de demo hardcoded no flavor cielo
+- [x] HTTPS only (sem cleartext no flavor cielo)
+- [x] Sem permissão PlugPag / intents de outras adquirentes no APK cielo
+- [ ] Client ID + Access Token no build do APK
+- [ ] APK assinado com o mesmo keystore que será usado nas atualizações
+- [ ] Package ID idêntico ao cadastrado na loja
 
 ---
 
-## 7. Checklist
-
-- [ ] Client ID + Access Token no Gradle e no backend  
-- [ ] Flavor `cielo`  
-- [ ] Metadata `cs_integration_type=uri` (já no projeto)  
-- [ ] Callback `order://response` (já no `PayActivity`)  
-- [ ] Teste débito, crédito e PIX  
-- [ ] Saída libera só comanda paga  
-
----
-
-## 8. Problemas comuns
+## 7. Problemas comuns
 
 | Problema | Solução |
 |----------|---------|
-| App Cielo não abre | Terminal precisa do app de pagamento Cielo; teste no emulador Smart |
-| Sem retorno após pagar | Não mate o PDV; a Cielo recomenda serviço em foreground |
-| Metadata não encontrado | Confirme o `<meta-data>` no manifest |
+| App Cielo não abre | Terminal precisa do UriApp; declare `com.ads.lio.uriappclient` em `<queries>` |
+| Sem retorno após pagar | Foreground service + não mate o PDV |
+| Metadata não encontrado | Confirme o `<meta-data cs_integration_type=uri>` |
 | Credenciais vazias | Exporte `CIELO_CLIENT_ID` / `CIELO_ACCESS_TOKEN` no build |
+| Assinatura rejeitada | Use Signature Scheme v2 e o **mesmo** JKS nas atualizações |

@@ -21,12 +21,14 @@ class CieloGateway : PaymentGateway {
     @Volatile
     private var pending: Continuation<PaymentResult>? = null
 
-    /** Token só no APK (BuildConfig) — backend não envia accessToken na API. */
     private fun resolveClientId(): String =
         SoftPosSession.cieloClientId?.takeIf { it.isNotBlank() }
             ?: BuildConfig.CIELO_CLIENT_ID
 
-    private fun resolveAccessToken(): String = BuildConfig.CIELO_ACCESS_TOKEN
+    /** Token só no APK (BuildConfig) — backend não deve enviar accessToken. */
+    private fun resolveAccessToken(): String =
+        SoftPosSession.cieloAccessToken?.takeIf { it.isNotBlank() }
+            ?: BuildConfig.CIELO_ACCESS_TOKEN
 
     override suspend fun activate(activationCode: String): PaymentResult {
         val ok = resolveClientId().isNotBlank() && resolveAccessToken().isNotBlank()
@@ -34,9 +36,9 @@ class CieloGateway : PaymentGateway {
             success = ok,
             transactionId = null,
             message = if (ok) {
-                "Cielo Smart pronta (Client ID configurado)"
+                "Terminal pronto (credenciais configuradas)"
             } else {
-                "Defina CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no flavor cielo (ou no backend)"
+                "Credenciais do terminal ausentes no APK (Client ID / Access Token)"
             },
         )
     }
@@ -47,16 +49,21 @@ class CieloGateway : PaymentGateway {
         userReference: String,
     ): PaymentResult {
         val activity = TerminalActivityHolder.current
-            ?: return PaymentResult(false, null, "Activity Cielo não disponível")
+            ?: return PaymentResult(false, null, "Tela de pagamento não disponível")
 
         val clientId = resolveClientId()
         val accessToken = resolveAccessToken()
-        if (clientId.isBlank() || accessToken.isBlank()) {
+        if (clientId.isBlank() || accessToken.isBlank() ||
+            clientId == "HOMOLOG_REPLACE_ME" || accessToken == "HOMOLOG_REPLACE_ME"
+        ) {
             return PaymentResult(
                 false,
                 null,
-                "Configure CIELO_CLIENT_ID e CIELO_ACCESS_TOKEN no APK flavor cielo (mesmo par do backend)",
+                "Credenciais do terminal ausentes no APK (Client ID / Access Token)",
             )
+        }
+        if (amountCents <= 0) {
+            return PaymentResult(false, null, "Valor inválido para pagamento")
         }
 
         val paymentCode = when (type) {
@@ -65,20 +72,21 @@ class CieloGateway : PaymentGateway {
             PaymentType.PIX -> "PIX"
         }
 
+        val sku = userReference.filter { it.isLetterOrDigit() }.take(20).ifBlank { "pdv" }
         val items = JSONArray().put(
             JSONObject()
                 .put("name", "Comanda PDV")
                 .put("quantity", 1)
-                .put("sku", userReference.take(10))
+                .put("sku", sku)
                 .put("unitOfMeasure", "unidade")
-                .put("unitPrice", amountCents)
-                .put("price", amountCents),
+                .put("unitPrice", amountCents),
         )
 
+        // Formato oficial Deep Link (value em centavos; reference opcional).
         val payload = JSONObject()
             .put("accessToken", accessToken)
             .put("clientID", clientId)
-            .put("reference", userReference)
+            .put("reference", userReference.take(40))
             .put("installments", 0)
             .put("items", items)
             .put("paymentCode", paymentCode)
@@ -93,16 +101,20 @@ class CieloGateway : PaymentGateway {
         return suspendCoroutine { cont ->
             pending = cont
             try {
+                // Obrigatório pela Cielo: FGS ativo durante o app de pagamento.
+                PaymentKeepAliveService.start(activity.applicationContext)
                 activity.startActivity(
-                    Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                    Intent(Intent.ACTION_VIEW, uri)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK),
                 )
             } catch (e: Exception) {
                 pending = null
+                PaymentKeepAliveService.stop(activity.applicationContext)
                 cont.resume(
                     PaymentResult(
                         false,
                         null,
-                        e.message ?: "App Cielo Smart não encontrado neste terminal",
+                        e.message ?: "App de pagamento do terminal não encontrado",
                     ),
                 )
             }
@@ -110,6 +122,8 @@ class CieloGateway : PaymentGateway {
     }
 
     override suspend fun abort(): Boolean {
+        val activity = TerminalActivityHolder.current
+        activity?.let { PaymentKeepAliveService.stop(it.applicationContext) }
         pending?.resume(PaymentResult(false, null, "Cancelado"))
         pending = null
         return true
@@ -118,30 +132,94 @@ class CieloGateway : PaymentGateway {
     fun onDeepLinkResult(uri: Uri?) {
         val cont = pending ?: return
         pending = null
+        TerminalActivityHolder.current?.let {
+            PaymentKeepAliveService.stop(it.applicationContext)
+        }
         if (uri == null) {
-            cont.resume(PaymentResult(false, null, "Sem retorno da Cielo"))
+            cont.resume(PaymentResult(false, null, "Sem retorno do terminal de pagamento"))
             return
         }
         try {
             val encoded = uri.getQueryParameter("response") ?: ""
+            if (encoded.isBlank()) {
+                cont.resume(PaymentResult(false, null, "Retorno do pagamento sem parâmetro response"))
+                return
+            }
             val json = String(Base64.decode(encoded, Base64.DEFAULT), Charsets.UTF_8)
-            val obj = JSONObject(json)
-            val code = obj.optString("code", obj.optString("status", ""))
-            val approved = code.equals("SUCCESS", true) ||
-                code.equals("PAID", true) ||
-                code.equals("0", true) ||
-                obj.optInt("code", -1) == 0
-            cont.resume(
-                PaymentResult(
-                    success = approved,
-                    transactionId = obj.optString("id").ifBlank {
-                        obj.optString("cieloCode").ifBlank { obj.optString("authCode") }
-                    },
-                    message = obj.optString("message").ifBlank { json.take(180) },
-                ),
-            )
+            cont.resume(parsePaymentResponse(json))
         } catch (e: Exception) {
-            cont.resume(PaymentResult(false, null, e.message ?: "Falha ao ler retorno Cielo"))
+            cont.resume(PaymentResult(false, null, e.message ?: "Falha ao ler retorno do pagamento"))
         }
+    }
+
+    /**
+     * Sucesso típico: Order com status ENTERED/PAID e array payments preenchido.
+     * Erro: { "code": 2, "reason": "..." }.
+     */
+    private fun parsePaymentResponse(json: String): PaymentResult {
+        val obj = JSONObject(json)
+
+        if (obj.has("code") && !obj.has("payments") && !obj.has("paidAmount")) {
+            val code = obj.optInt("code", -1)
+            val reason = obj.optString("reason").ifBlank { obj.optString("message") }
+            if (code != 0) {
+                return PaymentResult(
+                    false,
+                    null,
+                    reason.ifBlank { "Pagamento recusado (code=$code)" },
+                    rawCode = code,
+                )
+            }
+        }
+
+        val payments = obj.optJSONArray("payments")
+        val paidAmount = obj.optLong("paidAmount", -1)
+        val status = obj.optString("status")
+        val hasPayment = payments != null && payments.length() > 0
+        val statusOk = status.equals("ENTERED", true) ||
+            status.equals("PAID", true) ||
+            status.equals("SUCCESS", true) ||
+            status.equals("CLOSED", true)
+
+        val codeStr = obj.optString("code", obj.optString("status", ""))
+        val codeOk = codeStr.equals("SUCCESS", true) ||
+            codeStr.equals("PAID", true) ||
+            codeStr.equals("0", true) ||
+            obj.optInt("code", -1) == 0
+
+        val approved = hasPayment || (paidAmount > 0 && statusOk) || codeOk
+        if (!approved) {
+            return PaymentResult(
+                false,
+                null,
+                obj.optString("reason").ifBlank {
+                    obj.optString("message").ifBlank { "Pagamento não aprovado ($status)" }
+                },
+            )
+        }
+
+        var txId = obj.optString("id")
+        if (hasPayment) {
+            val first = payments!!.optJSONObject(0)
+            if (first != null) {
+                txId = first.optString("id").ifBlank {
+                    first.optString("paymentTransactionId").ifBlank {
+                        first.optString("cieloCode").ifBlank {
+                            first.optString("authCode").ifBlank {
+                                first.optJSONObject("paymentFields")
+                                    ?.optString("paymentTransactionId")
+                                    .orEmpty()
+                            }
+                        }
+                    }
+                }.ifBlank { txId }
+            }
+        }
+
+        return PaymentResult(
+            success = true,
+            transactionId = txId.ifBlank { null },
+            message = obj.optString("message").ifBlank { "Aprovado" },
+        )
     }
 }

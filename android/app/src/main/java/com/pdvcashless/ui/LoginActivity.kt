@@ -47,12 +47,16 @@ class LoginActivity : AppCompatActivity() {
                     SessionStore.userName = res.user.name
                     SessionStore.userRole = res.user.role
 
-                    if (!BuildConfig.DEMO_PAYMENT && activation.isNotBlank()) {
-                        val act = PaymentGatewayFactory.get().activate(activation)
-                        if (!act.success) {
-                            showError(act.message ?: "Falha ao ativar o terminal")
-                            binding.btnLogin.isEnabled = true
-                            return@launch
+                    if (!BuildConfig.DEMO_PAYMENT) {
+                        // Cielo: valida Client ID/Token do BuildConfig mesmo sem campo preenchido.
+                        // PagBank/MP: usa código digitado quando informado.
+                        if (BuildConfig.HAS_CIELO || activation.isNotBlank()) {
+                            val act = PaymentGatewayFactory.get().activate(activation)
+                            if (!act.success) {
+                                showError(act.message ?: "Falha ao ativar o terminal")
+                                binding.btnLogin.isEnabled = true
+                                return@launch
+                            }
                         }
                     }
 
